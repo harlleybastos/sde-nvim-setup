@@ -15,7 +15,7 @@ Personal Neovim configuration for development setup.
 1. Install Neovim 0.9.0+
 2. Clone this repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/nvim-config.git ~/.config/nvim
+git clone https://github.com/harlleybastos/sde-nvim-setup.git ~/.config/nvim
 ```
 3. Install Packer
 4. Open Neovim and run :PackerSync
