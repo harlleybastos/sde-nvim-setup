@@ -1,15 +1,31 @@
 -- ~/.config/nvim/lua/user/treesitter.lua
 require("nvim-treesitter.configs").setup({
   ensure_installed = {
-    -- Web development
+    -- Core languages
     "javascript", "typescript", "tsx",
-    "html", "css", "json",
-    -- Config files
-    "yaml", "toml", "dockerfile",
-    -- General
+    "ruby",
+    "c", "cpp",
+    "c_sharp",
+    "go", "gomod", "gosum",
+
+    -- Frontend
+    "html", "css", "scss",
+    "json", "jsonc",
+
+    -- Backend / Data
+    "prisma",
+    "sql",
+    "graphql",
+
+    -- DevOps
+    "dockerfile",
+    "hcl", "terraform",
+    "yaml", "toml",
+
+    -- General / Editor
     "vim", "vimdoc", "lua",
     "markdown", "markdown_inline",
-    "regex", "bash",
+    "regex", "bash", "jsdoc",
     "git_config", "gitignore",
   },
 

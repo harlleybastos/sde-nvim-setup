@@ -133,6 +133,9 @@ require("lazy").setup({
       require("user.lsp")
     end,
   },
+  -- SchemaStore: autocomplete schemas for JSON (package.json, tsconfig)
+  -- and YAML (docker-compose, GitHub Actions, k8s manifests)
+  { "b0o/schemastore.nvim", lazy = true },
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
