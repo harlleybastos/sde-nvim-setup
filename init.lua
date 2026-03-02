@@ -1,15 +1,11 @@
 -- ~/.config/nvim/init.lua
+
+-- Load options and keymaps BEFORE plugins
 require('user.options')
-require('user.keymaps')  -- We'll create this for keybindings
+require('user.keymaps')
+
+-- Bootstrap and load plugins (lazy.nvim)
 require('user.plugins')
-require('user.treesitter')
-require('user.lsp')
 
--- Set colorscheme
-vim.cmd[[colorscheme dracula]]
-
--- Setup nvim-tree
-require('nvim-tree').setup{}
-
--- Setup telescope
-require('telescope').setup{}
+-- Plugin configs are loaded via lazy.nvim config functions
+-- See lua/user/plugins.lua for the full plugin spec
