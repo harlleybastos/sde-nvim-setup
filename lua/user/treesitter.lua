@@ -1,5 +1,7 @@
 -- ~/.config/nvim/lua/user/treesitter.lua
-require("nvim-treesitter.configs").setup({
+-- ~/.config/nvim/lua/user/treesitter.lua
+local configs = require("nvim-treesitter.config")
+configs.setup({
   ensure_installed = {
     -- Core languages
     "javascript", "typescript", "tsx",
@@ -30,10 +32,9 @@ require("nvim-treesitter.configs").setup({
   },
 
   sync_install  = false,
-  auto_install  = true,  -- Auto-install parsers when opening a file
-
-  highlight = { enable = true },
-  indent    = { enable = true },
+  auto_install  = true,
+  highlight     = { enable = true },
+  indent        = { enable = true },
 
   incremental_selection = {
     enable = true,
@@ -45,10 +46,6 @@ require("nvim-treesitter.configs").setup({
     },
   },
 
-  -- ── Textobjects — navigate & select code structures ────
-  -- vaf = select entire function      vif = select function body
-  -- vac = select entire class         daf = delete whole function
-  -- ]m  = next function               [m  = previous function
   textobjects = {
     select = {
       enable    = true,
@@ -80,8 +77,8 @@ require("nvim-treesitter.configs").setup({
     },
     swap = {
       enable = true,
-      swap_next     = { ["<leader>sn"] = "@parameter.inner" },  -- Swap param forward
-      swap_previous = { ["<leader>sp"] = "@parameter.inner" },  -- Swap param backward
+      swap_next     = { ["<leader>sn"] = "@parameter.inner" },
+      swap_previous = { ["<leader>sp"] = "@parameter.inner" },
     },
   },
 })

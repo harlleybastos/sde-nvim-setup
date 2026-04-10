@@ -1,57 +1,26 @@
 -- ~/.config/nvim/lua/user/lsp.lua
--- Full-stack LSP configuration.
--- Servers are automatically installed via Mason on first launch.
--- Just open a file and Mason handles the rest.
-
 local mason           = require("mason")
 local mason_lspconfig = require("mason-lspconfig")
-local lspconfig       = require("lspconfig")
 
--- ── Mason — automatic LSP server installer ───────────────
 mason.setup()
 mason_lspconfig.setup({
   ensure_installed = {
-    -- Core languages
-    "ts_ls",           -- TypeScript / JavaScript / Node / React / Next / Angular
-    "solargraph",      -- Ruby / Ruby on Rails
-    "clangd",          -- C / C++
-    "omnisharp",       -- C#
-    "gopls",           -- Go
-
-    -- Frontend
-    "html",            -- HTML
-    "cssls",           -- CSS / SCSS
-    "tailwindcss",     -- TailwindCSS class autocomplete
-    "angularls",       -- Angular templates
-    "emmet_ls",        -- Emmet abbreviations (HTML/JSX shorthand)
-    "eslint",          -- ESLint (JS/TS linting + auto-fix)
-    "biome",           -- Biome (fast linter + formatter for JS/TS/JSON/CSS)
-
-    -- Backend / Data
-    "prismals",        -- Prisma ORM schemas
-    "jsonls",          -- JSON (with schema support for package.json, tsconfig, etc.)
-    "yamlls",          -- YAML (docker-compose, GitHub Actions, k8s manifests)
-
-    -- DevOps
-    "dockerls",                        -- Dockerfile
-    "docker_compose_language_service", -- docker-compose.yml
-    "terraformls",                     -- Terraform (.tf files)
-
-    -- Editor
-    "lua_ls",          -- Lua (for editing this Neovim config)
+    "ts_ls", "solargraph", "clangd", "omnisharp", "gopls",
+    "html", "cssls", "tailwindcss", "angularls", "emmet_ls",
+    "eslint", "biome", "prismals", "jsonls", "yamlls",
+    "dockerls", "docker_compose_language_service", "terraformls",
+    "lua_ls",
   },
 })
 
--- ── Completion (nvim-cmp) ────────────────────────────────
+-- ── Completion ───────────────────────────────────────────
 local cmp     = require("cmp")
 local luasnip = require("luasnip")
 require("luasnip.loaders.from_vscode").lazy_load()
 
 cmp.setup({
   snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
+    expand = function(args) luasnip.lsp_expand(args.body) end,
   },
   mapping = cmp.mapping.preset.insert({
     ["<C-Space>"] = cmp.mapping.complete(),
@@ -61,23 +30,15 @@ cmp.setup({
     ["<C-b>"]     = cmp.mapping.scroll_docs(-4),
     ["<C-f>"]     = cmp.mapping.scroll_docs(4),
     ["<C-e>"]     = cmp.mapping.abort(),
-    ["<Tab>"]     = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump()
+      else fallback() end
     end, { "i", "s" }),
-    ["<S-Tab>"]   = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then luasnip.jump(-1)
+      else fallback() end
     end, { "i", "s" }),
   }),
   sources = cmp.config.sources({
@@ -92,59 +53,48 @@ cmp.setup({
   },
 })
 
--- ── Shared capabilities (sent to every LSP server) ──────
+-- ── Capabilities ─────────────────────────────────────────
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
--- ── Servers with default config (no special settings) ────
+-- ── Servidores simples (nova API) ────────────────────────
 local simple_servers = {
-  "html",
-  "cssls",
-  "tailwindcss",
-  "angularls",
-  "emmet_ls",
-  "eslint",
-  "biome",            -- Biome (JS/TS/JSON/CSS linter + formatter)
-  "prismals",
-  "solargraph",     -- Ruby / Rails
-  "clangd",         -- C / C++
-  "dockerls",
-  "docker_compose_language_service",
-  "terraformls",
+  "html", "cssls", "tailwindcss", "angularls",
+  "emmet_ls", "eslint", "biome", "prismals",
+  "solargraph", "clangd", "dockerls",
+  "docker_compose_language_service", "terraformls",
+  "ts_ls",
 }
 for _, server in ipairs(simple_servers) do
-  lspconfig[server].setup({ capabilities = capabilities })
+  vim.lsp.config(server, { capabilities = capabilities })
+  vim.lsp.enable(server)
 end
 
--- ── TypeScript / JavaScript (covers Node, React, Next) ──
-lspconfig.ts_ls.setup({ capabilities = capabilities })
-
--- ── C# (OmniSharp) ──────────────────────────────────────
-lspconfig.omnisharp.setup({
+-- ── OmniSharp (C#) ──────────────────────────────────────
+vim.lsp.config("omnisharp", {
   capabilities = capabilities,
   settings = {
     FormattingOptions = { EnableEditorConfigSupport = true },
     RoslynExtensionsOptions = { EnableAnalyzersSupport = true },
   },
 })
+vim.lsp.enable("omnisharp")
 
 -- ── Go ───────────────────────────────────────────────────
-lspconfig.gopls.setup({
+vim.lsp.config("gopls", {
   capabilities = capabilities,
   settings = {
     gopls = {
-      analyses = {
-        unusedparams = true,
-        shadow       = true,
-      },
+      analyses    = { unusedparams = true, shadow = true },
       staticcheck = true,
       gofumpt     = true,
     },
   },
 })
+vim.lsp.enable("gopls")
 
--- ── JSON (with SchemaStore for package.json, tsconfig, etc.) ─
+-- ── JSON ─────────────────────────────────────────────────
 local schemastore_ok, schemastore = pcall(require, "schemastore")
-lspconfig.jsonls.setup({
+vim.lsp.config("jsonls", {
   capabilities = capabilities,
   settings = {
     json = {
@@ -153,30 +103,33 @@ lspconfig.jsonls.setup({
     },
   },
 })
+vim.lsp.enable("jsonls")
 
--- ── YAML (with SchemaStore for docker-compose, CI/CD, k8s) ──
-lspconfig.yamlls.setup({
+-- ── YAML ─────────────────────────────────────────────────
+vim.lsp.config("yamlls", {
   capabilities = capabilities,
   settings = {
     yaml = {
-      schemaStore = { enable = false, url = "" }, -- use schemastore.nvim instead
+      schemaStore = { enable = false, url = "" },
       schemas     = schemastore_ok and schemastore.yaml.schemas() or {},
       validate    = true,
     },
   },
 })
+vim.lsp.enable("yamlls")
 
--- ── Lua (configured for Neovim development — recognizes `vim` global) ─
-lspconfig.lua_ls.setup({
+-- ── Lua ──────────────────────────────────────────────────
+vim.lsp.config("lua_ls", {
   capabilities = capabilities,
   settings = {
     Lua = {
       diagnostics = { globals = { "vim" } },
       workspace   = {
-        library        = vim.api.nvim_get_runtime_file("", true),
+        library         = vim.api.nvim_get_runtime_file("", true),
         checkThirdParty = false,
       },
       telemetry = { enable = false },
     },
   },
 })
+vim.lsp.enable("lua_ls")

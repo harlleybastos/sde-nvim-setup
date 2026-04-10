@@ -13,32 +13,30 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+  {
+	  "dracula/vim",
+	  name = "dracula",
+	  lazy = false,
+	  priority = 1000,
+	  config = function()
+		  vim.cmd("colorscheme dracula")
 
-  -- ── Theme: Dracula PRO ─────────────────────────────────
-  -- Dracula PRO is a premium theme (https://draculatheme.com/pro)
-  -- After purchasing, place the vim theme folder at:
-  --   ~/.config/nvim/theme/dracula_pro/
-  -- Falls back to free Dracula if PRO is not installed.
-  {
-    dir = vim.fn.stdpath("config") .. "/theme/dracula_pro",
-    name = "dracula_pro",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      -- Try Dracula PRO first; if not found, use free Dracula
-      local ok = pcall(vim.cmd, "colorscheme dracula_pro")
-      if not ok then
-        -- PRO not installed yet — load free Dracula as fallback
-        pcall(vim.cmd, "colorscheme dracula")
-      end
-    end,
-  },
-  -- Free Dracula as fallback (only loaded when PRO is missing)
-  {
-    "dracula/vim",
-    name = "dracula",
-    lazy = true,
-    priority = 999,
+		  -- Override com as cores exatas do Dracula Pro
+		  vim.api.nvim_set_hl(0, "Normal",       { bg = "#22212C", fg = "#F8F8F2" })
+		  vim.api.nvim_set_hl(0, "NormalFloat",  { bg = "#22212C" })
+		  vim.api.nvim_set_hl(0, "Comment",      { fg = "#8B82C4", italic = true })
+		  vim.api.nvim_set_hl(0, "String",       { fg = "#66F859" })
+		  vim.api.nvim_set_hl(0, "Function",     { fg = "#7359F8" })
+		  vim.api.nvim_set_hl(0, "Keyword",      { fg = "#F859A8" })
+		  vim.api.nvim_set_hl(0, "Constant",     { fg = "#F8F859" })
+		  vim.api.nvim_set_hl(0, "Type",         { fg = "#5CF5DB" })
+		  vim.api.nvim_set_hl(0, "Number",       { fg = "#F87359" })
+		  vim.api.nvim_set_hl(0, "Identifier",   { fg = "#F8F8F2" })
+		  vim.api.nvim_set_hl(0, "Visual",       { bg = "#7359F8" })
+		  vim.api.nvim_set_hl(0, "CursorLine",   { bg = "#2D2B3D" })
+		  vim.api.nvim_set_hl(0, "LineNr",       { fg = "#8B82C4" })
+		  vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#F8F8F2", bold = true })
+	  end,
   },
 
   -- ── Neovim + Tmux seamless navigation ──────────────────
