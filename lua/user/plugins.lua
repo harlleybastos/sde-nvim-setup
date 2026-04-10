@@ -157,6 +157,9 @@ require("lazy").setup({
         view = { width = 35 },
         filters = { dotfiles = false },
         git = { enable = true },
+        filesystem_watchers = {
+          enable = false,
+        },
       })
     end,
   },
