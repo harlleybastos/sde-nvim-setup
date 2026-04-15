@@ -54,3 +54,8 @@ opt.isfname:append("@-@")
 -- Disable netrw (nvim-tree replaces it)
 vim.g.loaded_netrw       = 1
 vim.g.loaded_netrwPlugin = 1
+
+
+-- Disables the file watcher (doesn't work well on MSYS2/Windows)
+vim.opt.fsync = false
+vim.g.nvim_tree_fs_event = 0

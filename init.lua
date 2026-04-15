@@ -1,5 +1,4 @@
 -- ~/.config/nvim/init.lua
-
 -- Load options and keymaps BEFORE plugins
 require('user.options')
 require('user.keymaps')
