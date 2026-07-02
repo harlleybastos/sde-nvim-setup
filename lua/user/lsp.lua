@@ -45,6 +45,19 @@ vim.diagnostic.config({
   float         = { border = "rounded", source = true },
 })
 
+-- ── Convenience commands ─────────────────────────────────
+-- The modern vim.lsp.config API dropped the old `:LspInfo`/`:LspLog` commands.
+-- Re-add friendly aliases so the familiar commands still work.
+vim.api.nvim_create_user_command("LspInfo", "checkhealth vim.lsp",
+  { desc = "LSP status (alias for :checkhealth vim.lsp)" })
+vim.api.nvim_create_user_command("LspLog", function()
+  vim.cmd("tabnew " .. vim.lsp.get_log_path())
+end, { desc = "Open the LSP log file" })
+vim.api.nvim_create_user_command("LspRestart", function()
+  for _, c in ipairs(vim.lsp.get_clients()) do vim.lsp.stop_client(c.id) end
+  vim.cmd("edit")   -- re-triggers FileType so servers re-attach
+end, { desc = "Restart LSP clients for the current buffer" })
+
 -- ── Completion ───────────────────────────────────────────
 local cmp     = require("cmp")
 local luasnip = require("luasnip")
