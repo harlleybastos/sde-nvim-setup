@@ -8,6 +8,19 @@ Uses the **Dracula PRO** color scheme (with free Dracula as automatic fallback).
 
 ## Installation
 
+> **Requires Neovim 0.11 or newer** (this config uses the modern `vim.lsp.config`
+> LSP API). Check with `nvim --version`. If you're below 0.11, LSP + completion are
+> disabled with a warning until you upgrade — the rest of the editor still works.
+> On distros that ship an older Neovim (e.g. Rocky Linux's `dnf` package is 0.10.x),
+> install the latest from the official prebuilt release instead:
+>
+> ```bash
+> curl -fsSLo /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+> sudo tar -C /opt -xzf /tmp/nvim.tar.gz
+> sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
+> nvim --version   # confirm 0.11+
+> ```
+
 ### Prerequisites
 
 <details>
@@ -86,8 +99,29 @@ tmux source-file ~/.tmux.conf
 When you open Neovim for the first time, `lazy.nvim` will:
 1. Bootstrap itself
 2. Install all plugins
-3. Install Treesitter parsers
-4. Mason will install LSP servers: `ts_ls`, `html`, `cssls`, `eslint`, `lua_ls`
+3. Install Treesitter parsers (`:TSUpdate` runs automatically)
+4. Mason installs the configured LSP servers (this can take a few minutes)
+
+**LSP servers installed by Mason** (`lua/user/lsp.lua`), by category:
+
+- **JS / TS / web:** `ts_ls`, `html`, `cssls`, `tailwindcss`, `angularls`, `emmet_ls`, `eslint`, `biome`, `prismals`
+- **Data / config:** `jsonls`, `yamlls`, `graphql` *(via Treesitter)*
+- **Backend / systems:** `solargraph` (Ruby), `clangd` (C/C++), `omnisharp` (C#), `gopls` (Go)
+- **DevOps:** `dockerls`, `docker_compose_language_service`, `terraformls`
+- **Editor:** `lua_ls`
+
+> Some servers need their language toolchain present to install — e.g. `gopls`
+> needs Go, `solargraph` needs Ruby. If you don't use those languages, delete
+> them from the `ensure_installed` list in `lua/user/lsp.lua` to skip them.
+
+### Optional productivity tools
+
+These enable extra features but aren't required — the editor works without them:
+
+- **Formatters** (for format-on-save via conform.nvim): `prettierd` or `prettier`
+  (`npm i -g @fsouza/prettierd`), `stylua` (Lua), `gofmt` (ships with Go).
+- **lazygit** (opened with `<leader>tg`): a fast full-screen git UI. Arch:
+  `sudo pacman -S lazygit`. Others: see the lazygit install docs.
 
 ---
 
@@ -150,6 +184,9 @@ You can also:
 | `C-a f` | **Sessionizer** — switch project via fzf |
 | `C-a [` | Copy mode (vi keys) |
 | `C-a r` | Reload tmux config |
+
+> **Sessionizer path:** `C-a f` searches `~/Projects` (see `.tmux.conf`). If your
+> code lives elsewhere (e.g. `~/code`, `~/dev`), edit that path in `.tmux.conf`.
 
 ### File navigation
 
@@ -232,17 +269,37 @@ Mark the 3-5 files you're working on, then jump between them instantly:
 | `<Space>p` (visual) | Paste without losing register |
 | `<Space>y` | Yank to system clipboard |
 | `<Space>u` | Toggle Undotree |
+| `<Space>cf` | Format file / selection (also runs on save) |
 | `<` / `>` (visual) | Indent keeping selection |
 
 ### Buffers & windows
 
 | Shortcut | Action |
 |----------|--------|
-| `<Tab>` / `<S-Tab>` | Next / previous buffer |
+| `<Tab>` / `<S-Tab>` | Next / previous buffer (visible as tabs via bufferline) |
+| `<Space>bp` | Pick a tab/buffer by letter |
+| `<Space>bo` | Close all other buffers |
 | `<Space>x` | Close buffer |
 | `<Space>sv` / `<Space>sh` | Vertical / horizontal split |
 | `<C-h/j/k/l>` | Move between splits & Tmux panes |
 | `<C-arrows>` | Resize split |
+
+### Terminal & Git (inside Neovim)
+
+| Shortcut | Action |
+|----------|--------|
+| `<C-\>` | Toggle a floating terminal (like VS Code's Ctrl+\`) |
+| `<Space>tt` | Terminal in a horizontal split |
+| `<Space>tg` | Open **Lazygit** (needs the `lazygit` tool) |
+
+### Learning aids
+
+| Shortcut | Action |
+|----------|--------|
+| `<Space>H` | Toggle **Hardtime** (Vim-motion trainer) |
+| `<Space>?` | **Open interactive cheatsheet** |
+| `:Tutor` | Built-in 30-min Vim tutorial |
+| `:set mouse=` | Disable the mouse to force keyboard-only (re-enable: `:set mouse=a`) |
 
 ### General
 
@@ -299,4 +356,10 @@ Mark the 3-5 files you're working on, then jump between them instantly:
 | **which-key.nvim** | Shows available keybindings on `<Space>` |
 | **undotree** | Visual undo history |
 | **nvim-surround** | Manipulate surrounding chars/tags |
+| **bufferline.nvim** | Visible editor tabs for open files |
+| **conform.nvim** | Format on save (Prettier / stylua / gofmt) |
+| **toggleterm.nvim** | Integrated terminal + Lazygit float |
+| **indent-blankline.nvim** | Indent guides |
+| **nvim-navic** | Code breadcrumbs in the winbar |
+| **hardtime.nvim** | Vim-motion trainer (breaks mouse/arrow habits) |
 

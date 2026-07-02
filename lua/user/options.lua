@@ -59,3 +59,18 @@ vim.g.loaded_netrwPlugin = 1
 -- Disables the file watcher (doesn't work well on MSYS2/Windows)
 vim.opt.fsync = false
 vim.g.nvim_tree_fs_event = 0
+
+-- ── First-run nudge ──────────────────────────────────────
+-- When Neovim opens with no file arguments, point new users at the
+-- interactive cheatsheet (<leader>?) and the built-in Vim tutorial.
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    if vim.fn.argc() == 0 then
+      vim.notify(
+        "Press  <Space>?  for the cheatsheet   ·   :Tutor  for the Vim tutorial",
+        vim.log.levels.INFO,
+        { title = "Neovim" }
+      )
+    end
+  end,
+})

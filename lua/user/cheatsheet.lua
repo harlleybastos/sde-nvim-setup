@@ -41,6 +41,9 @@ M.entries = {
   { "<C-u>",          "Scroll half page up (cursor stays centered)",       "2. Move",   "Like PageUp but smoother." },
   { "%",              "Jump to matching bracket {} () []",                 "2. Move",   "Put cursor on a bracket and press %. Like VS Code's 'Go to Bracket'." },
   { "{ / }",          "Jump to previous / next blank line (paragraph)",    "2. Move",   "Quick way to skip between code blocks separated by empty lines." },
+  { "<C-o>",          "Jump BACK to where you were (jumplist)",            "2. Move",   "Like Alt+Left in VS Code. After 'gd' (go to definition), press <C-o> to return." },
+  { "<C-i>",          "Jump FORWARD again (jumplist)",                     "2. Move",   "Like Alt+Right in VS Code. Re-does a <C-o> jump." },
+  { "g; / g,",        "Go to previous / next place you EDITED",           "2. Move",   "Jumps between your recent edits, even across files. Great after wandering." },
 
   -- ═══════════════════════════════════════════════════════════════
   -- FIND ON SCREEN — replacing Ctrl+F and mouse clicking
@@ -71,6 +74,15 @@ M.entries = {
   { "<Tab>",          "Switch to next open file (buffer)",                "4. Files",  "Like Ctrl+Tab in VS Code to cycle through open tabs." },
   { "<S-Tab>",        "Switch to previous open file (buffer)",            "4. Files",  "Like Ctrl+Shift+Tab in VS Code." },
   { "<leader>x",      "Close current file (buffer)",                      "4. Files",  "Like Ctrl+W to close the current tab in VS Code." },
+  { "<leader>bp",     "Pick a tab/buffer by letter (bufferline)",         "4. Files",  "Shows a letter on each tab — press it to jump straight there." },
+  { "<leader>bo",     "Close all OTHER files, keep this one",             "4. Files",  "Like 'Close Others' on a VS Code tab." },
+  -- File explorer operations — these work INSIDE the tree (open it with <leader>e)
+  { "a  (in explorer)",  "Create a new file or folder",                  "4. Files",  "Inside the file explorer. Type a name; end it with / to make a folder." },
+  { "r  (in explorer)",  "Rename the file under the cursor",             "4. Files",  "Inside the explorer. Edits the name inline, then press Enter." },
+  { "d  (in explorer)",  "Delete the file under the cursor",             "4. Files",  "Inside the explorer. Asks for confirmation first." },
+  { "x / c / p (expl.)", "Cut / copy / paste files in the tree",         "4. Files",  "Inside the explorer: x=cut, c=copy, move to a folder, then p=paste." },
+  { "R  (in explorer)",  "Refresh the file tree",                        "4. Files",  "Inside the explorer. Reloads folder contents from disk." },
+  { "<CR> (in explorer)","Open file / expand folder",                    "4. Files",  "Inside the explorer. On a file it opens it; on a folder it expands." },
 
   -- ═══════════════════════════════════════════════════════════════
   -- HARPOON — pin your working files (like VS Code pinned tabs)
@@ -170,6 +182,7 @@ M.entries = {
   { "<CR>",           "Accept autocomplete suggestion",                   "10. Code",  "Press Enter to confirm the selected completion." },
   { "<C-j>/<C-k>",   "Navigate autocomplete list up/down",              "10. Code",  "Like arrow keys in VS Code's autocomplete dropdown." },
   { "<C-e>",          "Dismiss autocomplete menu",                        "10. Code",  "Like pressing Escape on the autocomplete popup." },
+  { "<leader>cf",     "Format the file (or selection)",                   "10. Code",  "Like Shift+Alt+F in VS Code. Also runs automatically on save (Prettier/stylua/gofmt)." },
 
   -- ═══════════════════════════════════════════════════════════════
   -- CODE STRUCTURE NAVIGATION — jumping between functions/classes
@@ -191,6 +204,9 @@ M.entries = {
   { "<C-h/j/k/l>",   "Move between editor splits (and Tmux panes!)",   "12. Windows", "This is the magic — same keys work in Neovim splits AND Tmux panes." },
   { "<C-Up/Down>",    "Make split taller / shorter",                     "12. Windows", "Resize splits with arrow keys." },
   { "<C-Left/Right>", "Make split wider / narrower",                     "12. Windows", "" },
+  { "<C-\\>",         "Toggle a floating terminal inside Neovim",         "12. Windows", "Like VS Code's Ctrl+` integrated terminal. Press again to hide it." },
+  { "<leader>tt",     "Open a terminal in a horizontal split",            "12. Windows", "A terminal docked at the bottom, like VS Code's panel." },
+  { "<leader>tg",     "Open Lazygit (fast git UI)",                       "12. Windows", "A full git interface: stage, commit, branch, push. Needs the 'lazygit' tool installed." },
 
   -- ═══════════════════════════════════════════════════════════════
   -- TMUX — the terminal multiplexer wrapping everything
@@ -213,6 +229,9 @@ M.entries = {
   { "<leader>fk",     "Search ALL keybindings (every single one)",       "14. Help",  "Like VS Code's Keyboard Shortcuts editor but searchable." },
   { "<leader>fh",     "Search Neovim help documentation",                "14. Help",  "Search the built-in docs. Type a topic like 'motion' or 'register'." },
   { ":Tutor",         "Open the built-in Vim tutorial",                   "14. Help",  "A 30-minute interactive tutorial built into Neovim. Great starting point!" },
+  { "<leader>H",      "Toggle Hardtime (the Vim-motion trainer)",         "14. Help",  "Hardtime nudges you toward efficient motions when you spam j/k or arrows. Turn it off here if it gets in the way." },
+  { ":set mouse=",    "Go hardcore: disable the mouse to force Vim",       "14. Help",  "When you're ready to stop reaching for the mouse, run this to disable it. Re-enable with :set mouse=a." },
+  { "How to practice","Learn the motions a little every day",              "14. Help",  "1) Do :Tutor once. 2) Keep Hardtime on. 3) Use <leader>? whenever you'd reach for the mouse — find the keyboard way, then use it." },
 }
 
 -- ── Picker UI ────────────────────────────────────────────────────

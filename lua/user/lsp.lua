@@ -1,16 +1,45 @@
 -- ~/.config/nvim/lua/user/lsp.lua
+-- This module uses the modern vim.lsp.config()/vim.lsp.enable() API, which
+-- requires Neovim 0.11+. Guard against older versions so the whole config
+-- degrades gracefully instead of throwing E5108 on startup.
+if vim.fn.has("nvim-0.11") == 0 then
+  vim.schedule(function()
+    vim.notify(
+      "This config needs Neovim 0.11+. LSP + completion are disabled — please upgrade Neovim.",
+      vim.log.levels.WARN,
+      { title = "Neovim LSP" }
+    )
+  end)
+  return
+end
+
 local mason           = require("mason")
 local mason_lspconfig = require("mason-lspconfig")
 
 mason.setup()
 mason_lspconfig.setup({
   ensure_installed = {
-    "ts_ls", "solargraph", "clangd", "omnisharp", "gopls",
+    "ts_ls", "solargraph", "clangd",
     "html", "cssls", "tailwindcss", "angularls", "emmet_ls",
     "eslint", "biome", "prismals", "jsonls", "yamlls",
     "dockerls", "docker_compose_language_service", "terraformls",
     "lua_ls",
+    -- Removed gopls (needs Go) and omnisharp (needs .NET). Add them back
+    -- here once the toolchain is installed, along with their config blocks.
   },
+  -- We enable + configure every server explicitly below (attaching cmp
+  -- capabilities), so disable mason's automatic enable to avoid a second,
+  -- capability-less pass.
+  automatic_enable = false,
+})
+
+-- ── Diagnostics UI (inline errors like VS Code's red squiggles) ─────
+vim.diagnostic.config({
+  virtual_text  = true,             -- show the message inline after the line
+  signs         = true,             -- gutter icons
+  underline     = true,
+  severity_sort = true,
+  float         = { border = "rounded", source = true },
 })
 
 -- ── Completion ───────────────────────────────────────────
@@ -53,8 +82,28 @@ cmp.setup({
   },
 })
 
+-- Auto-insert () after accepting a function/method completion (like VS Code).
+local autopairs_ok, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
+if autopairs_ok then
+  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+end
+
 -- ── Capabilities ─────────────────────────────────────────
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+-- ── Breadcrumbs: attach nvim-navic to LSP servers that support symbols ──
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and client.server_capabilities.documentSymbolProvider then
+      local navic_ok, navic = pcall(require, "nvim-navic")
+      if navic_ok then
+        navic.attach(client, args.buf)
+        vim.wo.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
+      end
+    end
+  end,
+})
 
 -- ── Servidores simples (nova API) ────────────────────────
 local simple_servers = {
@@ -68,29 +117,6 @@ for _, server in ipairs(simple_servers) do
   vim.lsp.config(server, { capabilities = capabilities })
   vim.lsp.enable(server)
 end
-
--- ── OmniSharp (C#) ──────────────────────────────────────
-vim.lsp.config("omnisharp", {
-  capabilities = capabilities,
-  settings = {
-    FormattingOptions = { EnableEditorConfigSupport = true },
-    RoslynExtensionsOptions = { EnableAnalyzersSupport = true },
-  },
-})
-vim.lsp.enable("omnisharp")
-
--- ── Go ───────────────────────────────────────────────────
-vim.lsp.config("gopls", {
-  capabilities = capabilities,
-  settings = {
-    gopls = {
-      analyses    = { unusedparams = true, shadow = true },
-      staticcheck = true,
-      gofumpt     = true,
-    },
-  },
-})
-vim.lsp.enable("gopls")
 
 -- ── JSON ─────────────────────────────────────────────────
 local schemastore_ok, schemastore = pcall(require, "schemastore")

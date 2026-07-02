@@ -1,5 +1,8 @@
 -- ~/.config/nvim/lua/user/treesitter.lua
-local configs = require("nvim-treesitter.config")
+-- NOTE: this uses the classic `master`-branch API of nvim-treesitter.
+-- The plugin is pinned to branch = "master" in plugins.lua (the `main`
+-- branch is an incompatible rewrite that needs Neovim 0.12 nightly).
+local configs = require("nvim-treesitter.configs")
 configs.setup({
   ensure_installed = {
     -- Core languages
@@ -11,7 +14,7 @@ configs.setup({
 
     -- Frontend
     "html", "css", "scss",
-    "json", "jsonc",
+    "json",   -- jsonc is aliased to json below (its own grammar is broken upstream)
 
     -- Backend / Data
     "prisma",
@@ -38,10 +41,12 @@ configs.setup({
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection    = "<CR>",
-      node_incremental  = "<CR>",
-      node_decremental  = "<BS>",
-      scope_incremental = "<TAB>",
+      init_selection    = "<CR>",   -- start selecting the node under the cursor
+      node_incremental  = "<CR>",   -- press again to grow the selection
+      node_decremental  = "<BS>",   -- shrink the selection
+      -- scope_incremental intentionally left unmapped: <TAB> is used for
+      -- buffer switching (see keymaps.lua) and cmp completion (see lsp.lua).
+      scope_incremental = false,
     },
   },
 
@@ -81,3 +86,8 @@ configs.setup({
     },
   },
 })
+
+-- jsonc files (tsconfig.json, .vscode/*.json, etc.) reuse the `json` parser.
+-- The dedicated jsonc grammar tarball is currently broken upstream, so we
+-- alias the filetype instead of installing a separate parser.
+pcall(vim.treesitter.language.register, "json", "jsonc")

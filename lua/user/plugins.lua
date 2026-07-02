@@ -78,8 +78,10 @@ require("lazy").setup({
     event = "VeryLazy",
     opts = {},
     keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash: jump" },
-      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash: treesitter select" },
+      -- `s` is bound in normal + operator-pending only, so visual-mode `s`
+      -- (substitute) keeps working as beginners expect.
+      { "s", mode = { "n", "o" },      function() require("flash").jump() end,       desc = "Flash: jump" },
+      { "S", mode = { "n", "o" },      function() require("flash").treesitter() end, desc = "Flash: treesitter select" },
     },
   },
 
@@ -109,11 +111,15 @@ require("lazy").setup({
   },
 
   -- ── Treesitter — syntax highlighting & textobjects ─────
+  -- Pinned to the `master` branch: it is stable, backward-compatible, and
+  -- matches the module API used in user/treesitter.lua. The `main` branch is
+  -- an incompatible rewrite that requires Neovim 0.12 nightly.
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "master",
     build = ":TSUpdate",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
+      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "master" },
     },
     config = function()
       require("user.treesitter")
@@ -240,6 +246,8 @@ require("lazy").setup({
         { "<leader>s",  group = "Split / Swap" },
         { "<leader>c",  group = "Code" },
         { "<leader>l",  group = "LSP" },
+        { "<leader>b",  group = "Buffers / tabs" },
+        { "<leader>t",  group = "Terminal / git" },
       })
     end,
   },
@@ -258,6 +266,137 @@ require("lazy").setup({
     version = "*",
     event = "VeryLazy",
     config = function() require("nvim-surround").setup({}) end,
+  },
+
+  -- ── Bufferline — visible editor tabs (VS Code tab bar) ──
+  -- Open files show as tabs at the top. Cycle with <Tab>/<S-Tab>.
+  {
+    "akinsho/bufferline.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    event = "VeryLazy",
+    config = function()
+      require("bufferline").setup({
+        options = {
+          mode                   = "buffers",
+          diagnostics            = "nvim_lsp",   -- show LSP errors on each tab
+          show_buffer_close_icons = true,
+          show_close_icon        = false,
+          separator_style        = "thin",
+          offsets = {
+            { filetype = "NvimTree", text = "Explorer", highlight = "Directory", separator = true },
+          },
+        },
+      })
+      vim.keymap.set("n", "<leader>bp", "<cmd>BufferLinePick<CR>",        { desc = "Pick a buffer/tab" })
+      vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close other buffers" })
+    end,
+  },
+
+  -- ── conform.nvim — format on save (like Prettier in VS Code) ──
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd   = { "ConformInfo" },
+    config = function()
+      local conform = require("conform")
+      -- Prettier for web files, falling back from the daemon to the CLI.
+      local prettier = { "prettierd", "prettier", stop_after_first = true }
+      conform.setup({
+        formatters_by_ft = {
+          javascript     = prettier,
+          javascriptreact = prettier,
+          typescript     = prettier,
+          typescriptreact = prettier,
+          json           = prettier,
+          jsonc          = prettier,
+          css            = prettier,
+          scss           = prettier,
+          html           = prettier,
+          yaml           = prettier,
+          markdown       = prettier,
+          graphql        = prettier,
+          lua            = { "stylua" },
+          go             = { "gofmt" },
+        },
+        -- Auto-format on save; fall back to the LSP formatter when no
+        -- dedicated formatter is installed for a filetype.
+        format_on_save = {
+          timeout_ms = 1000,
+          lsp_format = "fallback",
+        },
+      })
+      vim.keymap.set({ "n", "v" }, "<leader>cf", function()
+        conform.format({ async = true, lsp_format = "fallback" })
+      end, { desc = "Format file / selection" })
+    end,
+  },
+
+  -- ── toggleterm — integrated terminal (like VS Code's Ctrl+`) ──
+  -- <C-\> toggles a floating terminal without leaving Neovim.
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    event = "VeryLazy",
+    config = function()
+      require("toggleterm").setup({
+        open_mapping = [[<c-\>]],
+        direction    = "float",
+        float_opts   = { border = "curved" },
+      })
+
+      local Terminal = require("toggleterm.terminal").Terminal
+
+      local horiz = Terminal:new({ direction = "horizontal", hidden = true })
+      vim.keymap.set("n", "<leader>tt", function() horiz:toggle() end,
+        { desc = "Terminal (horizontal split)" })
+
+      -- Lazygit in a fullscreen float. Needs the `lazygit` binary installed;
+      -- if it's missing the terminal just shows a 'command not found' message.
+      local lazygit = Terminal:new({ cmd = "lazygit", direction = "float", hidden = true })
+      vim.keymap.set("n", "<leader>tg", function() lazygit:toggle() end,
+        { desc = "Lazygit (git TUI)" })
+    end,
+  },
+
+  -- ── indent-blankline — indent guides (like VS Code) ──
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main  = "ibl",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("ibl").setup({
+        indent = { char = "│" },
+        scope  = { enabled = true, show_start = false, show_end = false },
+      })
+    end,
+  },
+
+  -- ── nvim-navic — code breadcrumbs in the winbar (VS Code breadcrumbs) ──
+  -- Attaches to the LSP in lua/user/lsp.lua (see the LspAttach autocmd).
+  {
+    "SmiteshP/nvim-navic",
+    lazy = true,
+    init = function() vim.g.navic_silence = true end,
+    config = function()
+      require("nvim-navic").setup({ highlight = true })
+    end,
+  },
+
+  -- ── hardtime.nvim — Vim-motion trainer (breaks VS Code habits) ──
+  -- Nudges you toward efficient motions instead of spamming j/k/arrows.
+  -- Toggle it off any time with <leader>H.
+  {
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    event = "VeryLazy",
+    config = function()
+      require("hardtime").setup({
+        restriction_mode = "hint",   -- hint (gentle), not block — beginner friendly
+        disable_mouse    = false,    -- keep the mouse usable while you learn
+      })
+      vim.keymap.set("n", "<leader>H", "<cmd>Hardtime toggle<CR>",
+        { desc = "Toggle Hardtime (Vim trainer)" })
+    end,
   },
 
 }, {

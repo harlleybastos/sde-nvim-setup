@@ -74,8 +74,9 @@ keymap({ "n", "v" }, "<leader>D", [["_d]], { desc = "Delete without yanking" })
 keymap("n", "<leader>w", ":w<CR>", { desc = "Save file" })
 keymap("n", "<leader>q", ":q<CR>", { desc = "Quit" })
 
--- Clear search highlight
-keymap("n", "<Esc>", ":noh<CR>", { desc = "Clear search highlight" })
+-- Clear search highlight. <cmd> keeps clean normal-mode semantics (unlike
+-- ":noh<CR>", it doesn't briefly enter/leave command-line mode).
+keymap("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
 -- Select all
 keymap("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
