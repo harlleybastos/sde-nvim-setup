@@ -12,6 +12,10 @@ configs.setup({
     "c_sharp",
     "go", "gomod", "gosum",
 
+    -- Game / native / graphics
+    "cmake",        -- CMakeLists.txt
+    "glsl",         -- OpenGL / Vulkan shaders (.vert/.frag/.comp/...)
+
     -- Frontend
     "html", "css", "scss",
     "json",   -- jsonc is aliased to json below (its own grammar is broken upstream)

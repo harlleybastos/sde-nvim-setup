@@ -248,6 +248,8 @@ require("lazy").setup({
         { "<leader>l",  group = "LSP" },
         { "<leader>b",  group = "Buffers / tabs" },
         { "<leader>t",  group = "Terminal / git" },
+        { "<leader>d",  group = "Debug (DAP)" },
+        { "<leader>C",  group = "CMake (build/run/debug)" },
       })
     end,
   },
@@ -317,6 +319,8 @@ require("lazy").setup({
           graphql        = prettier,
           lua            = { "stylua" },
           go             = { "gofmt" },
+          c              = { "clang-format" },
+          cpp            = { "clang-format" },
         },
         -- Auto-format on save; fall back to the LSP formatter when no
         -- dedicated formatter is installed for a filetype.
@@ -397,6 +401,143 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>H", "<cmd>Hardtime toggle<CR>",
         { desc = "Toggle Hardtime (Vim trainer)" })
     end,
+  },
+
+  -- ══════════════════════════════════════════════════════════
+  -- C / C++ / GAME-ENGINE (OpenGL, Vulkan) TOOLING
+  -- ══════════════════════════════════════════════════════════
+
+  -- Auto-install non-LSP tools (formatters/etc.) via Mason
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    event = "VeryLazy",
+    config = function()
+      require("mason-tool-installer").setup({
+        ensure_installed = { "clang-format" },  -- C/C++ formatter for conform
+        run_on_start = true,
+      })
+    end,
+  },
+
+  -- ── Debugging (DAP) — breakpoints, stepping, watches (like VS Code F5) ──
+  -- codelldb debugs C/C++ (and Rust). :CMakeDebug wires this up for CMake projects.
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "nvim-neotest/nvim-nio",
+      "theHamsta/nvim-dap-virtual-text",
+      "jay-babu/mason-nvim-dap.nvim",
+    },
+    keys = {
+      { "<F5>",  function() require("dap").continue() end,   desc = "Debug: start / continue" },
+      { "<F10>", function() require("dap").step_over() end,  desc = "Debug: step over" },
+      { "<F11>", function() require("dap").step_into() end,  desc = "Debug: step into" },
+      { "<leader>dc", function() require("dap").continue() end,          desc = "Continue / start" },
+      { "<leader>do", function() require("dap").step_out() end,          desc = "Step out" },
+      { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint" },
+      { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, desc = "Conditional breakpoint" },
+      { "<leader>dr", function() require("dap").repl.toggle() end,       desc = "Toggle REPL" },
+      { "<leader>dl", function() require("dap").run_last() end,          desc = "Run last" },
+      { "<leader>dt", function() require("dap").terminate() end,         desc = "Terminate" },
+      { "<leader>du", function() require("dapui").toggle() end,          desc = "Toggle debug UI" },
+      { "<leader>de", function() require("dapui").eval() end, mode = { "n", "v" }, desc = "Evaluate expression" },
+    },
+    config = function()
+      local dap   = require("dap")
+      local dapui = require("dapui")
+
+      -- Auto-install codelldb and wire its adapter
+      require("mason-nvim-dap").setup({
+        ensure_installed = { "codelldb" },
+        automatic_installation = true,
+        handlers = {
+          function(config) require("mason-nvim-dap").default_setup(config) end,
+        },
+      })
+
+      dapui.setup()
+      require("nvim-dap-virtual-text").setup()
+
+      -- C / C++ launch config (prompts for the built executable)
+      local launch = {
+        {
+          name    = "Launch (pick executable)",
+          type    = "codelldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
+          end,
+          cwd         = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+        {
+          name    = "Attach to process",
+          type    = "codelldb",
+          request = "attach",
+          pid     = require("dap.utils").pick_process,
+          cwd     = "${workspaceFolder}",
+        },
+      }
+      dap.configurations.cpp = launch
+      dap.configurations.c   = launch
+
+      -- Nicer breakpoint / stopped signs
+      vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DiagnosticError" })
+      vim.fn.sign_define("DapStopped",    { text = "▶", texthl = "DiagnosticWarn", linehl = "Visual" })
+
+      -- Open/close the debug UI automatically
+      dap.listeners.after.event_initialized["dapui_config"]  = function() dapui.open() end
+      dap.listeners.before.event_terminated["dapui_config"]  = function() dapui.close() end
+      dap.listeners.before.event_exited["dapui_config"]      = function() dapui.close() end
+    end,
+  },
+
+  -- ── CMake integration — configure / build / run / debug from Neovim ──
+  -- Generates compile_commands.json (clangd reads it) and drives :CMakeDebug via DAP.
+  {
+    "Civitasv/cmake-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    ft  = { "c", "cpp", "cmake", "objc", "objcpp" },
+    cmd = {
+      "CMakeGenerate", "CMakeBuild", "CMakeRun", "CMakeDebug",
+      "CMakeSelectBuildTarget", "CMakeSelectLaunchTarget",
+      "CMakeSelectBuildType", "CMakeClean",
+    },
+    keys = {
+      { "<F7>",       "<cmd>CMakeBuild<CR>",              desc = "CMake: build" },
+      { "<leader>Cg", "<cmd>CMakeGenerate<CR>",           desc = "CMake: generate / configure" },
+      { "<leader>Cb", "<cmd>CMakeBuild<CR>",              desc = "CMake: build" },
+      { "<leader>Cr", "<cmd>CMakeRun<CR>",                desc = "CMake: run" },
+      { "<leader>Cd", "<cmd>CMakeDebug<CR>",              desc = "CMake: debug (DAP)" },
+      { "<leader>Ct", "<cmd>CMakeSelectBuildType<CR>",    desc = "CMake: select build type" },
+      { "<leader>CT", "<cmd>CMakeSelectBuildTarget<CR>",  desc = "CMake: select build target" },
+      { "<leader>Cl", "<cmd>CMakeSelectLaunchTarget<CR>", desc = "CMake: select launch target" },
+      { "<leader>Cc", "<cmd>CMakeClean<CR>",              desc = "CMake: clean" },
+    },
+    opts = {
+      cmake_command                    = "cmake",
+      cmake_build_directory            = "build",
+      cmake_generate_options           = { "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON" },
+      cmake_soft_link_compile_commands = true,   -- symlink compile_commands.json to project root
+      dap_configuration = {
+        type          = "codelldb",
+        request       = "launch",
+        stopOnEntry   = false,
+        runInTerminal = false,
+      },
+    },
+  },
+
+  -- ── clangd extensions — inlay hints, AST, type hierarchy for C++ ──
+  {
+    "p00f/clangd_extensions.nvim",
+    ft = { "c", "cpp", "objc", "objcpp", "cuda" },
+    opts = {
+      inlay_hints = { inline = true },
+      ast = { role_icons = {}, kind_icons = {} },
+    },
   },
 
 }, {

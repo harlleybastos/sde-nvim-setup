@@ -24,6 +24,9 @@ mason_lspconfig.setup({
     "eslint", "biome", "prismals", "jsonls", "yamlls",
     "dockerls", "docker_compose_language_service", "terraformls",
     "lua_ls",
+    -- Game / native / graphics
+    "cmake",          -- CMakeLists.txt (cmake-language-server)
+    "glsl_analyzer",  -- GLSL shaders (OpenGL / Vulkan)
     -- Removed gopls (needs Go) and omnisharp (needs .NET). Add them back
     -- here once the toolchain is installed, along with their config blocks.
   },
@@ -109,14 +112,42 @@ vim.api.nvim_create_autocmd("LspAttach", {
 local simple_servers = {
   "html", "cssls", "tailwindcss", "angularls",
   "emmet_ls", "eslint", "biome", "prismals",
-  "solargraph", "clangd", "dockerls",
+  "solargraph", "dockerls",
   "docker_compose_language_service", "terraformls",
   "ts_ls",
+  "cmake",          -- CMakeLists.txt
+  "glsl_analyzer",  -- GLSL shaders (OpenGL / Vulkan)
 }
 for _, server in ipairs(simple_servers) do
   vim.lsp.config(server, { capabilities = capabilities })
   vim.lsp.enable(server)
 end
+
+-- ── clangd (C / C++ — game engines, OpenGL, Vulkan) ──────
+-- offsetEncoding utf-16 avoids the "multiple offset encodings" warning when
+-- clangd attaches alongside other clients. clangd needs compile_commands.json
+-- (CMake: -DCMAKE_EXPORT_COMPILE_COMMANDS=ON, or use :CMakeGenerate).
+local clangd_caps = vim.deepcopy(capabilities)
+clangd_caps.offsetEncoding = { "utf-16" }
+vim.lsp.config("clangd", {
+  capabilities = clangd_caps,
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=iwyu",
+    "--completion-style=detailed",
+    "--function-arg-placeholders",
+    "--fallback-style=llvm",
+  },
+  init_options = {
+    usePlaceholders = true,
+    completeUnimported = true,
+    clangdFileStatus = true,
+    fallbackFlags = { "-std=c++20" },
+  },
+})
+vim.lsp.enable("clangd")
 
 -- ── JSON ─────────────────────────────────────────────────
 local schemastore_ok, schemastore = pcall(require, "schemastore")

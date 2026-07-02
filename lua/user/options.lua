@@ -60,6 +60,19 @@ vim.g.loaded_netrwPlugin = 1
 vim.opt.fsync = false
 vim.g.nvim_tree_fs_event = 0
 
+-- ── Shader files → glsl (OpenGL + Vulkan) ────────────────
+-- Ensures .vert/.frag/etc. get the glsl filetype so Treesitter highlighting
+-- and glsl_analyzer LSP kick in. Covers OpenGL, Vulkan ray-tracing and mesh shaders.
+vim.filetype.add({
+  extension = {
+    vert = "glsl", frag = "glsl", geom = "glsl",
+    tesc = "glsl", tese = "glsl", comp = "glsl", glsl = "glsl",
+    rgen = "glsl", rchit = "glsl", rahit = "glsl",
+    rmiss = "glsl", rint = "glsl", rcall = "glsl",
+    mesh = "glsl", task = "glsl",
+  },
+})
+
 -- ── First-run nudge ──────────────────────────────────────
 -- When Neovim opens with no file arguments, point new users at the
 -- interactive cheatsheet (<leader>?) and the built-in Vim tutorial.

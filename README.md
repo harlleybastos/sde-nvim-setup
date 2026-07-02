@@ -314,6 +314,86 @@ Mark the 3-5 files you're working on, then jump between them instantly:
 
 ---
 
+## C / C++ / Game-engine development (OpenGL, Vulkan)
+
+This setup includes a full native/graphics toolchain. **Inside Neovim** everything is
+auto-installed via Mason (`clangd`, `clang-format`, `cmake-language-server`,
+`glsl_analyzer`, `codelldb`); you only need the **system build tools** below.
+
+### System dependencies
+
+<details>
+<summary><strong>Rocky Linux / RHEL (WSL2 or bare metal)</strong></summary>
+
+```bash
+# Compiler + build system
+sudo dnf install -y gcc-c++ clang clang-tools-extra cmake ninja-build make gdb
+
+# OpenGL dev libraries
+sudo dnf install -y mesa-libGL-devel mesa-libGLU-devel glfw-devel glew-devel glm-devel
+
+# Vulkan: headers, loader, validation layers + shader compilers (glslc / glslangValidator)
+sudo dnf install -y vulkan-loader-devel vulkan-validation-layers vulkan-tools glslang glslc
+```
+</details>
+
+<details>
+<summary><strong>Arch Linux</strong></summary>
+
+```bash
+sudo pacman -S --noconfirm base-devel clang cmake ninja gdb
+sudo pacman -S --noconfirm mesa glu glfw glew glm            # OpenGL
+sudo pacman -S --noconfirm vulkan-headers vulkan-icd-loader vulkan-validation-layers vulkan-tools shaderc glslang   # Vulkan
+```
+</details>
+
+> On WSL2, GPU acceleration works through WSLg (Mesa d3d12). For heavy Vulkan work you
+> may prefer running the built binary on native Windows; editing/building/debugging in WSL is fine.
+
+### What you get
+
+| Area | Tool | Notes |
+|------|------|-------|
+| C/C++ intelligence | **clangd** | completion, go-to-def, diagnostics, inlay hints (clangd_extensions) |
+| Formatting | **clang-format** | on save + `<Space>cf` (respects your `.clang-format`) |
+| Build system | **cmake-tools.nvim** + cmake LSP | configure/build/run/debug from the editor |
+| Debugging | **nvim-dap** + **codelldb** | breakpoints, stepping, watches, REPL (VS Code-style) |
+| Shaders | **glsl_analyzer** + Treesitter `glsl` | `.vert/.frag/.comp/.geom/.tesc/.tese` + Vulkan `.rgen/.rchit/.rmiss/.rahit/.rint/.rcall/.mesh/.task` |
+| Syntax | Treesitter `c`, `cpp`, `cmake`, `glsl` | |
+
+### Workflow (CMake project)
+
+```
+1. Open the project root in Neovim (cd into it first, or use the Tmux sessionizer C-a f)
+2. <Space>Cg   → :CMakeGenerate   (creates build/ + compile_commands.json for clangd)
+3. <Space>Ct   → pick build type (Debug to debug, Release for speed)
+4. <F7>        → build            (errors land in the quickfix: <Space>j / <Space>k to navigate)
+5. <Space>Cr   → run  |  <Space>Cd → debug (breakpoints with <Space>db, then <F5>)
+```
+
+**clangd needs `compile_commands.json`.** `:CMakeGenerate` creates it (the config passes
+`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` and soft-links it to the project root). For non-CMake
+builds, generate it with [bear](https://github.com/rizsotto/Bear): `bear -- make`.
+
+### Quick reference — C++ / Debug / CMake
+
+| Shortcut | Action |
+|----------|--------|
+| `<Space>Cg` / `<Space>Cb` / `<F7>` | CMake generate / build |
+| `<Space>Cr` / `<Space>Cd` | CMake run / debug |
+| `<Space>Ct` / `<Space>Cl` | Select build type / launch target |
+| `<F5>` | Debug: start / continue |
+| `<F10>` / `<F11>` / `<Space>do` | Step over / into / out |
+| `<Space>db` / `<Space>dB` | Toggle / conditional breakpoint |
+| `<Space>du` / `<Space>de` | Toggle debug UI / eval expression |
+| `<Space>dr` / `<Space>dt` | Toggle REPL / terminate |
+| `K` · `gd` · `gr` · `<Space>ca` | Hover · definition · references · code action (clangd) |
+
+> **Add Go/C# back later:** `gopls` and `omnisharp` were removed from the auto-install list.
+> Once you install the Go/.NET toolchains, re-add them in `lua/user/lsp.lua`.
+
+---
+
 ## Project structure
 
 ```
@@ -362,4 +442,9 @@ Mark the 3-5 files you're working on, then jump between them instantly:
 | **indent-blankline.nvim** | Indent guides |
 | **nvim-navic** | Code breadcrumbs in the winbar |
 | **hardtime.nvim** | Vim-motion trainer (breaks mouse/arrow habits) |
+| **nvim-dap** (+ dap-ui, virtual-text) | Debugger: breakpoints, stepping, watches |
+| **mason-nvim-dap** | Auto-installs `codelldb` (C/C++/Rust debugger) |
+| **cmake-tools.nvim** | CMake configure/build/run/debug from Neovim |
+| **clangd_extensions.nvim** | C++ inlay hints, AST, type hierarchy |
+| **mason-tool-installer** | Auto-installs non-LSP tools (clang-format) |
 

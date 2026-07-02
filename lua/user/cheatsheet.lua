@@ -222,6 +222,27 @@ M.entries = {
   { "C-a r",          "[Tmux] Reload tmux config after changes",        "13. Tmux",  "" },
 
   -- ═══════════════════════════════════════════════════════════════
+  -- C / C++ / GAME DEV — CMake build system + debugger (DAP)
+  -- ═══════════════════════════════════════════════════════════════
+  { "<leader>Cg",     "CMake: configure / generate the project",         "15. C++/Game", "Runs cmake and creates compile_commands.json so clangd understands your includes." },
+  { "<F7>",           "CMake: build (also <leader>Cb)",                  "15. C++/Game", "Compiles the project. Errors show in the quickfix list — jump with <leader>j / <leader>k." },
+  { "<leader>Cr",     "CMake: run the selected target",                  "15. C++/Game", "Builds (if needed) and runs your executable." },
+  { "<leader>Cd",     "CMake: DEBUG the target (starts the debugger)",   "15. C++/Game", "Builds with debug info and launches codelldb through nvim-dap. Like F5 in VS Code for CMake projects." },
+  { "<leader>Ct",     "CMake: pick build type (Debug/Release/…)",        "15. C++/Game", "Debug for debugging, Release for a fast build." },
+  { "<leader>Cl",     "CMake: pick which executable to run/debug",       "15. C++/Game", "For projects with several targets (game, tests, tools)." },
+  { "<F5>",           "Debug: start / continue",                         "15. C++/Game", "Like F5 in VS Code. Starts debugging or continues to the next breakpoint." },
+  { "<F10>",          "Debug: step OVER the current line",               "15. C++/Game", "Runs the line without stepping into function calls." },
+  { "<F11>",          "Debug: step INTO a function call",                "15. C++/Game", "Dives into the function on the current line." },
+  { "<leader>do",     "Debug: step OUT of the current function",         "15. C++/Game", "Runs until the current function returns." },
+  { "<leader>db",     "Debug: toggle a breakpoint on this line",         "15. C++/Game", "Like clicking the gutter in VS Code. A red ● marks it." },
+  { "<leader>dB",     "Debug: conditional breakpoint",                   "15. C++/Game", "Only stops when a condition is true, e.g. i == 100." },
+  { "<leader>du",     "Debug: toggle the debugger UI panels",            "15. C++/Game", "Shows scopes, watches, call stack, breakpoints and the REPL." },
+  { "<leader>de",     "Debug: evaluate expression under cursor",         "15. C++/Game", "Works in normal and visual mode — inspect a variable's value." },
+  { "<leader>dr",     "Debug: toggle the REPL / debug console",          "15. C++/Game", "Type expressions to evaluate while paused." },
+  { "<leader>dt",     "Debug: terminate the session",                    "15. C++/Game", "Stops debugging." },
+  { ".vert / .frag …", "Shaders auto-detected as GLSL (highlight + LSP)", "15. C++/Game", "OpenGL & Vulkan shader files (.vert/.frag/.comp/.rgen/…) get glsl highlighting + glsl_analyzer completion." },
+
+  -- ═══════════════════════════════════════════════════════════════
   -- HELP & DISCOVERY
   -- ═══════════════════════════════════════════════════════════════
   { "<leader>?",      "Open this cheatsheet!",                           "14. Help",  "You're here right now!" },
