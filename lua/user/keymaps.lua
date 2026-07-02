@@ -31,12 +31,23 @@ keymap("n", "gd",         vim.lsp.buf.definition,      { desc = "Go to definitio
 keymap("n", "gD",         vim.lsp.buf.declaration,      { desc = "Go to declaration" })
 keymap("n", "gr",         vim.lsp.buf.references,       { desc = "Show references" })
 keymap("n", "gi",         vim.lsp.buf.implementation,   { desc = "Go to implementation" })
+keymap("n", "gy",         vim.lsp.buf.type_definition,  { desc = "Go to type definition" })
 keymap("n", "K",          vim.lsp.buf.hover,            { desc = "Hover documentation" })
 keymap("n", "<leader>ca", vim.lsp.buf.code_action,      { desc = "Code action" })
 keymap("n", "<leader>rn", vim.lsp.buf.rename,           { desc = "Rename symbol" })
 keymap("n", "<leader>ld", vim.diagnostic.open_float,    { desc = "Line diagnostics" })
-keymap("n", "[d",         vim.diagnostic.goto_prev,     { desc = "Previous diagnostic" })
-keymap("n", "]d",         vim.diagnostic.goto_next,     { desc = "Next diagnostic" })
+-- vim.diagnostic.jump is the modern API (goto_prev/goto_next are deprecated in 0.11+)
+keymap("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Previous diagnostic" })
+keymap("n", "]d", function() vim.diagnostic.jump({ count =  1, float = true }) end, { desc = "Next diagnostic" })
+
+-- Neovim 0.11+ ships default LSP maps under the `gr` prefix (grn/gra/grr/gri/
+-- grt/grx). They made our `gr` (references) and `gi` (implementation) wait
+-- ~300ms to disambiguate. We already cover every one of these actions
+-- (gr, gi, gy, <leader>rn, <leader>ca), so drop the built-ins for instant keys.
+for _, lhs in ipairs({ "grn", "gra", "grr", "gri", "grt", "grx" }) do
+  pcall(vim.keymap.del, "n", lhs)
+end
+pcall(vim.keymap.del, "x", "gra")
 
 -- ── Buffers ──────────────────────────────────────────────
 keymap("n", "<Tab>",   ":bnext<CR>",     { desc = "Next buffer" })

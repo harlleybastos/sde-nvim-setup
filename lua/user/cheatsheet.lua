@@ -171,6 +171,7 @@ M.entries = {
   { "gD",             "Go to declaration",                                "10. Code",  "Similar to gd but goes to the declaration (useful in some languages)." },
   { "gr",             "Find all references (like Shift+F12)",            "10. Code",  "Shows every place where the symbol is used." },
   { "gi",             "Go to implementation",                             "10. Code",  "For interfaces/abstract classes — jumps to the implementation." },
+  { "gy",             "Go to type definition",                            "10. Code",  "Jumps to where the TYPE of the symbol under the cursor is defined." },
   { "K",              "Show hover documentation (like mouse hover)",     "10. Code",  "Press K on any symbol to see its type, docs — like hovering in VS Code." },
   { "<leader>ca",     "Open code actions (like Ctrl+. in VS Code)",      "10. Code",  "Quick fixes, refactoring options, auto-imports." },
   { "<leader>rn",     "Rename symbol across all files (like F2)",        "10. Code",  "Renames the variable/function everywhere in the project." },
