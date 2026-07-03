@@ -30,6 +30,8 @@ M.entries = {
   { "w",              "Jump forward to start of next word",                "2. Move",   "Like Ctrl+Right in VS Code but stops at word boundaries." },
   { "b",              "Jump backward to start of previous word",           "2. Move",   "Like Ctrl+Left in VS Code." },
   { "e",              "Jump forward to end of current/next word",          "2. Move",   "Lands at the last character of the word." },
+  { "W / B / E",      "Jump by WORD (whitespace-separated)",               "2. Move",   "Bigger than w/b/e: treats 'foo.bar()' as ONE word, so you skip over punctuation fast." },
+  { "ge",             "Jump to the END of the previous word",              "2. Move",   "The backward version of e." },
   { "0",              "Go to beginning of line",                           "2. Move",   "Like Home key in VS Code." },
   { "^",              "Go to first non-blank character of line",           "2. Move",   "Like Home key but skips leading whitespace/indentation." },
   { "$",              "Go to end of line",                                 "2. Move",   "Like End key in VS Code." },
@@ -37,6 +39,9 @@ M.entries = {
   { "G",              "Go to last line of file",                           "2. Move",   "Like Ctrl+End in VS Code." },
   { "{number}G",      "Go to specific line number (e.g. 42G)",            "2. Move",   "Like Ctrl+G in VS Code then typing the line number." },
   { "5j / 10k",       "Jump 5 lines down / 10 lines up",                  "2. Move",   "Combine a number + direction. Relative line numbers on the left help you count!" },
+  { "H / M / L",      "Jump to top / middle / bottom of the screen",      "2. Move",   "High / Middle / Low. Move across what you can see without scrolling." },
+  { "zz / zt / zb",   "Put the current line at center / top / bottom",     "2. Move",   "zz centers your line on screen — perfect right after a jump or a search." },
+  { "ma  then  `a",   "Set mark 'a' / jump back to it",                    "2. Move",   "Bookmarks inside a file (any letter). Press `` (backtick twice) to jump to your PREVIOUS spot." },
   { "<C-d>",          "Scroll half page down (cursor stays centered)",     "2. Move",   "Like PageDown but smoother — cursor stays in the middle of the screen." },
   { "<C-u>",          "Scroll half page up (cursor stays centered)",       "2. Move",   "Like PageUp but smoother." },
   { "%",              "Jump to matching bracket {} () []",                 "2. Move",   "Put cursor on a bracket and press %. Like VS Code's 'Go to Bracket'." },
@@ -206,6 +211,7 @@ M.entries = {
   { "<C-Up/Down>",    "Make split taller / shorter",                     "12. Windows", "Resize splits with arrow keys." },
   { "<C-Left/Right>", "Make split wider / narrower",                     "12. Windows", "" },
   { "<C-\\>",         "Toggle a floating terminal inside Neovim",         "12. Windows", "Like VS Code's Ctrl+` integrated terminal. Press again to hide it." },
+  { "<C-\\><C-n>",    "Leave terminal 'typing' mode → Normal mode",        "12. Windows", "In a terminal you're in insert mode. Press <C-\\> then <C-n> to scroll/copy with hjkl; press i to type again." },
   { "<leader>tt",     "Open a terminal in a horizontal split",            "12. Windows", "A terminal docked at the bottom, like VS Code's panel." },
   { "<leader>tg",     "Open Lazygit (fast git UI)",                       "12. Windows", "A full git interface: stage, commit, branch, push. Needs the 'lazygit' tool installed." },
 
@@ -216,6 +222,8 @@ M.entries = {
   { "C-a -",          "[Tmux] Split terminal horizontally",              "13. Tmux",  "Terminal above and below." },
   { "C-h/j/k/l",     "[Tmux] Navigate between ALL panes",              "13. Tmux",  "Same keys as Neovim splits! Seamless movement across everything." },
   { "Alt-h/j/k/l",   "[Tmux] Resize pane",                              "13. Tmux",  "" },
+  { "C-a z",          "[Tmux] Zoom the current pane to fullscreen",      "13. Tmux",  "Focus one pane full-screen; press C-a z again to bring the others back." },
+  { "C-a d",          "[Tmux] Detach (leave tmux running in background)","13. Tmux",  "Your session keeps running. Reattach later with 'tmux attach'." },
   { "C-a c",          "[Tmux] Open new window (like a VS Code tab)",    "13. Tmux",  "A tmux window is like a tab — each can have its own splits." },
   { "Alt-1..5",       "[Tmux] Switch to window 1-5",                     "13. Tmux",  " Like Alt+1 switches to tab 1 in VS Code." },
   { "C-a f",          "[Tmux] Switch project (sessionizer)",             "13. Tmux",  "Fuzzy-find a project folder and instantly switch to it. Each project = a session." },
@@ -246,7 +254,8 @@ M.entries = {
   -- ═══════════════════════════════════════════════════════════════
   -- HELP & DISCOVERY
   -- ═══════════════════════════════════════════════════════════════
-  { "<leader>?",      "Open this cheatsheet!",                           "14. Help",  "You're here right now!" },
+  { "<leader>?",      "Open the day-to-day quick guide (grouped panel)",  "14. Help",  "A glanceable panel grouped by task: move, search, replace, format, build, tmux. Your in-editor sticky note." },
+  { "<F1>",           "Search THIS cheatsheet by action",                 "14. Help",  "You're here right now! Type what you'd do in VS Code and find the Vim way." },
   { "<Space> (wait)", "Show all available shortcuts (which-key)",        "14. Help",  "Press Space and wait 300ms — a popup shows all leader key bindings." },
   { "<leader>fk",     "Search ALL keybindings (every single one)",       "14. Help",  "Like VS Code's Keyboard Shortcuts editor but searchable." },
   { "<leader>fh",     "Search Neovim help documentation",                "14. Help",  "Search the built-in docs. Type a topic like 'motion' or 'register'." },

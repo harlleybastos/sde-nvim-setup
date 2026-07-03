@@ -110,7 +110,16 @@ keymap("n", "<C-Down>",  ":resize -2<CR>",          opts)
 keymap("n", "<C-Left>",  ":vertical resize -2<CR>", opts)
 keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 
--- ── Cheatsheet (interactive help) ────────────────────────
--- Press <leader>? to open a searchable cheatsheet inside Neovim
-keymap("n", "<leader>?", function() require("user.cheatsheet").open() end,
-  { desc = "Navigation cheatsheet" })
+-- ── Help panels ──────────────────────────────────────────
+-- <Space>? : glanceable day-to-day guide, grouped by task (in-editor sticky note)
+-- <F1>     : searchable cheatsheet — type the action you'd do in VS Code
+keymap("n", "<leader>?", function() require("user.quickref").toggle() end,
+  { desc = "Quick guide (day-to-day)" })
+keymap("n", "<F1>", function() require("user.cheatsheet").open() end,
+  { desc = "Search cheatsheet (by action)" })
+vim.api.nvim_create_user_command("Guide", function() require("user.quickref").toggle() end,
+  { desc = "Open the day-to-day quick guide" })
+vim.api.nvim_create_user_command("Cheatsheet", function() require("user.cheatsheet").open() end,
+  { desc = "Search the cheatsheet by action" })
+vim.api.nvim_create_user_command("Tip", function() require("user.tips").show() end,
+  { desc = "Show a random Neovim learning tip" })

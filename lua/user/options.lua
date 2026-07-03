@@ -73,17 +73,15 @@ vim.filetype.add({
   },
 })
 
--- ── First-run nudge ──────────────────────────────────────
--- When Neovim opens with no file arguments, point new users at the
--- interactive cheatsheet (<leader>?) and the built-in Vim tutorial.
+-- ── Learn-a-little-every-session nudge ───────────────────
+-- Show one rotating pro tip on startup (skip git commit/rebase editors).
+-- On demand: :Tip  ·  full guide: <Space>?
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
-    if vim.fn.argc() == 0 then
-      vim.notify(
-        "Press  <Space>?  for the cheatsheet   ·   :Tutor  for the Vim tutorial",
-        vim.log.levels.INFO,
-        { title = "Neovim" }
-      )
-    end
+    local ft = vim.bo.filetype
+    if ft == "gitcommit" or ft == "gitrebase" then return end
+    vim.defer_fn(function()
+      pcall(function() require("user.tips").show() end)
+    end, 150)
   end,
 })

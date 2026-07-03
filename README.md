@@ -106,13 +106,13 @@ When you open Neovim for the first time, `lazy.nvim` will:
 
 - **JS / TS / web:** `ts_ls`, `html`, `cssls`, `tailwindcss`, `angularls`, `emmet_ls`, `eslint`, `biome`, `prismals`
 - **Data / config:** `jsonls`, `yamlls`, `graphql` *(via Treesitter)*
-- **Backend / systems:** `solargraph` (Ruby), `clangd` (C/C++), `omnisharp` (C#), `gopls` (Go)
+- **Native / game:** `clangd` (C/C++), `cmake` (CMake), `glsl_analyzer` (shaders), `solargraph` (Ruby)
 - **DevOps:** `dockerls`, `docker_compose_language_service`, `terraformls`
 - **Editor:** `lua_ls`
 
-> Some servers need their language toolchain present to install — e.g. `gopls`
-> needs Go, `solargraph` needs Ruby. If you don't use those languages, delete
-> them from the `ensure_installed` list in `lua/user/lsp.lua` to skip them.
+> `gopls` (Go) and `omnisharp` (C#) are **not** installed by default (they need the
+> Go / .NET toolchains). Add them back to the `ensure_installed` list in
+> `lua/user/lsp.lua` once those toolchains are present.
 
 ### Optional productivity tools
 
@@ -125,26 +125,37 @@ These enable extra features but aren't required — the editor works without the
 
 ---
 
-## Don't know how to do something? Press `<Space>?`
+## Two built-in helpers (no external cheatsheet needed)
 
-This setup includes a **searchable interactive cheatsheet** built into Neovim.
-
-Press **`<leader>?`** (Space + ?) and type what you *want to do* in plain English:
+**`<Space>?` → the day-to-day guide.** A glanceable floating panel grouped by the
+tasks you do all day, in learning order — your in-editor sticky note:
 
 ```
-┌─ Navigation Cheatsheet — type what you want to do ──────┐
-│ > jump function                                          │
-│   ]m / [m           │ Next / previous function           │
-│   vaf               │ Select entire function             │
-│   daf               │ Delete entire function             │
-│   gd                │ Go to definition                   │
-└──────────────────────────────────────────────────────────┘
+╭ Neovim · day-to-day ────────────────────────────────────╮
+│  ▌ 3 · WINDOWS & SPLITS — move between panes             │
+│      <C-h> / <C-l>   move to LEFT / RIGHT split          │
+│  ▌ 6 · SEARCH — find files & text                        │
+│      <Space>ff       find file by name        (Ctrl+P)   │
+│  ▌ 7 · REPLACE — change & rename                         │
+│      <Space>rn       rename symbol (semantic)     (F2)   │
+╰──────────────────  q / <Esc> close  ────────────────────╯
 ```
+12 sections: move · fast motions · windows · explorer · buffers · search ·
+replace · edit · format · lint · build/debug · tmux.
+Edit it in [`lua/user/quickref.lua`](lua/user/quickref.lua). Also on `:Guide`.
+
+**`<F1>` → the searchable cheatsheet.** Type what you'd do in VS Code (e.g. "rename",
+"find file", "comment") and it shows the Vim way. Also on `:Cheatsheet`.
 
 You can also:
-- Press **`<Space>`** and wait 300ms → **which-key** shows all available keybindings
-- Press **`<Space>fk`** → search ALL keymaps via Telescope
-- Press **`<Space>fh`** → search Neovim help tags
+- Press **`<Space>`** and wait → **which-key** shows every leader binding
+- **`<Space>fk`** → search ALL keymaps · **`<Space>fh`** → search Neovim help
+- New to Vim? Start with **[LEARNING.md](LEARNING.md)** (plan + daily drills)
+
+**Learn while you work (automatic):** a rotating pro **tip** shows on each startup
+(`:Tip` for another); **hardtime** nudges you toward better motions when you mash a key
+(`<Space>H` toggles); and **`:Precognition`** overlays the exact motion keys next to your
+cursor for drilling. See [LEARNING.md](LEARNING.md#learn-while-you-work-automatic-feedback).
 
 ---
 
@@ -441,7 +452,8 @@ builds, generate it with [bear](https://github.com/rizsotto/Bear): `bear -- make
 | **toggleterm.nvim** | Integrated terminal + Lazygit float |
 | **indent-blankline.nvim** | Indent guides |
 | **nvim-navic** | Code breadcrumbs in the winbar |
-| **hardtime.nvim** | Vim-motion trainer (breaks mouse/arrow habits) |
+| **hardtime.nvim** | Vim-motion trainer — nudges you toward better motions |
+| **precognition.nvim** | Live motion hints overlay (`:Precognition`) |
 | **nvim-dap** (+ dap-ui, virtual-text) | Debugger: breakpoints, stepping, watches |
 | **mason-nvim-dap** | Auto-installs `codelldb` (C/C++/Rust debugger) |
 | **cmake-tools.nvim** | CMake configure/build/run/debug from Neovim |

@@ -395,12 +395,26 @@ require("lazy").setup({
     event = "VeryLazy",
     config = function()
       require("hardtime").setup({
-        restriction_mode = "hint",   -- hint (gentle), not block — beginner friendly
+        restriction_mode = "hint",   -- hint (teaches), not block — beginner friendly
         disable_mouse    = false,    -- keep the mouse usable while you learn
+        hint             = true,     -- suggest a better motion inline
+        notification     = true,     -- pop the "you pressed j too many times" nudges
+        max_count        = 4,        -- allow up to 4 repeats before nudging
       })
       vim.keymap.set("n", "<leader>H", "<cmd>Hardtime toggle<CR>",
         { desc = "Toggle Hardtime (Vim trainer)" })
     end,
+  },
+
+  -- ── precognition — live motion hints next to the cursor (learn motions) ──
+  -- Shows which keys (w b e ^ $ f …) get you where you're looking. Off by
+  -- default so it's not noisy; turn it on to drill motions: :Precognition
+  -- (or :Precognition toggle / on / off).
+  {
+    "tris203/precognition.nvim",
+    event = "VeryLazy",
+    cmd   = "Precognition",       -- ensure :Precognition is always available
+    opts  = { startVisible = false },
   },
 
   -- ══════════════════════════════════════════════════════════
