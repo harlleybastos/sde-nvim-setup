@@ -160,7 +160,12 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("nvim-tree").setup({
-        view = { width = 35 },
+        view = { width = 35 },       -- default width of the tree (change this number)
+        renderer = {
+          -- Show just the folder name (e.g. "gaming") instead of the full
+          -- "~/Projects/Study/gaming/.." path. Use false to hide it entirely.
+          root_folder_label = ":t",
+        },
         filters = { dotfiles = false },
         git = { enable = true },
         filesystem_watchers = {
