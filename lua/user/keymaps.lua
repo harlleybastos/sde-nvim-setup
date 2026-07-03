@@ -27,11 +27,19 @@ keymap("n", "<C-p>",      ":Telescope find_files<CR>",            { desc = "Find
 keymap("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
 
 -- ── LSP navigation ───────────────────────────────────────
-keymap("n", "gd",         vim.lsp.buf.definition,      { desc = "Go to definition" })
-keymap("n", "gD",         vim.lsp.buf.declaration,      { desc = "Go to declaration" })
-keymap("n", "gr",         vim.lsp.buf.references,       { desc = "Show references" })
-keymap("n", "gi",         vim.lsp.buf.implementation,   { desc = "Go to implementation" })
-keymap("n", "gy",         vim.lsp.buf.type_definition,  { desc = "Go to type definition" })
+-- Record the current spot in the jumplist before jumping (m' does that), so
+-- <C-o> reliably brings you back after gd/gi/gy — even across files.
+local function lsp_jump(fn)
+  return function()
+    vim.cmd("normal! m'")
+    fn()
+  end
+end
+keymap("n", "gd",         lsp_jump(vim.lsp.buf.definition),      { desc = "Go to definition" })
+keymap("n", "gD",         lsp_jump(vim.lsp.buf.declaration),     { desc = "Go to declaration" })
+keymap("n", "gr",         vim.lsp.buf.references,                { desc = "Show references" })
+keymap("n", "gi",         lsp_jump(vim.lsp.buf.implementation),  { desc = "Go to implementation" })
+keymap("n", "gy",         lsp_jump(vim.lsp.buf.type_definition), { desc = "Go to type definition" })
 keymap("n", "K",          vim.lsp.buf.hover,            { desc = "Hover documentation" })
 keymap("n", "<leader>ca", vim.lsp.buf.code_action,      { desc = "Code action" })
 keymap("n", "<leader>rn", vim.lsp.buf.rename,           { desc = "Rename symbol" })

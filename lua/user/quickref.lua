@@ -10,9 +10,19 @@ M.win = nil
 -- Each section: { title, rows = { {keys, "what it does (VS Code reflex)"}, ... } }
 M.sections = {
   {
+    title = "★ LOST IN A FILE? move by DISTANCE",
+    rows = {
+      { "same line",   "f{char} (then ; ,) · w / b by word · 0 / $ ends" },
+      { "same screen", "s + 2 letters (Flash) · H / M / L · { } paragraphs" },
+      { "whole file",  "/text search · gg / G / :N · ]m [m functions" },
+      { "come back",   "<C-o> back · <C-i> forward · `` to last spot" },
+    },
+  },
+  {
     title = "1 · MOVE THE CURSOR — basics",
     rows = {
       { "h j k l",       "left · down · up · right" },
+      { "5j / 12k",      "jump N lines — read N off the left number column!" },
       { "w / b / e",     "next / previous word · end of word" },
       { "W / B / E",     "same but by WORD (skips punctuation)" },
       { "0 / ^ / $",     "line start · first non-blank · line end" },
