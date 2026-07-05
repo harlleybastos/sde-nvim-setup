@@ -304,6 +304,16 @@ require("lazy").setup({
     "stevearc/conform.nvim",
     event = { "BufWritePre" },
     cmd   = { "ConformInfo" },
+    -- Defined here (not in config) so <leader>cf works even before the first
+    -- save — lazy creates the mapping and loads conform on demand.
+    keys = {
+      {
+        "<leader>cf",
+        function() require("conform").format({ async = true, lsp_format = "fallback" }) end,
+        mode = { "n", "x" },
+        desc = "Format file / selection",
+      },
+    },
     config = function()
       local conform = require("conform")
       -- Prettier for web files, falling back from the daemon to the CLI.
@@ -334,9 +344,6 @@ require("lazy").setup({
           lsp_format = "fallback",
         },
       })
-      vim.keymap.set({ "n", "v" }, "<leader>cf", function()
-        conform.format({ async = true, lsp_format = "fallback" })
-      end, { desc = "Format file / selection" })
     end,
   },
 
