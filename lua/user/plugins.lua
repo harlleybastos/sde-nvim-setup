@@ -676,7 +676,11 @@ require("lazy").setup({
       { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", desc = "Markdown preview (browser)" },
     },
     config = function()
-      if vim.fn.has("wsl") == 1 then vim.g.mkdp_browser = "wslview" end  -- open in Windows browser
+      -- On WSL, open in the Windows browser via wslview if it's installed
+      -- (sudo dnf install wslu). Otherwise mkdp prints a URL you can open.
+      if vim.fn.has("wsl") == 1 and vim.fn.executable("wslview") == 1 then
+        vim.g.mkdp_browser = "wslview"
+      end
     end,
   },
 
