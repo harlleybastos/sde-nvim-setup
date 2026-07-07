@@ -114,9 +114,10 @@ M.sections = {
   {
     title = "9 · FORMAT",
     rows = {
-      { "<Space>cf",     "format file / selection         (Shift+Alt+F)" },
+      { "<Space>cf",     "format the WHOLE file (real formatter)  (Shift+Alt+F)" },
+      { "V then <Space>cf","format JUST the selected line(s)" },
       { "(on save)",     "auto-formats on <Space>w / :w" },
-      { "gg=G",          "re-indent the whole file" },
+      { "== / gg=G",     "re-INDENT line / whole file (indent only, not full format)" },
     },
   },
   {
