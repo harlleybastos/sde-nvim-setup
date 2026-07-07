@@ -105,14 +105,28 @@ When you open Neovim for the first time, `lazy.nvim` will:
 **LSP servers installed by Mason** (`lua/user/lsp.lua`), by category:
 
 - **JS / TS / web:** `ts_ls`, `html`, `cssls`, `tailwindcss`, `angularls`, `emmet_ls`, `eslint`, `biome`, `prismals`
+- **Languages:** `pyright` (Python), `rust_analyzer` (Rust), `gopls` (Go), `omnisharp` (C#), `solargraph` (Ruby)
+- **Native / game:** `clangd` (C/C++), `cmake` (CMake), `glsl_analyzer` (shaders)
 - **Data / config:** `jsonls`, `yamlls`, `graphql` *(via Treesitter)*
-- **Native / game:** `clangd` (C/C++), `cmake` (CMake), `glsl_analyzer` (shaders), `solargraph` (Ruby)
 - **DevOps:** `dockerls`, `docker_compose_language_service`, `terraformls`
 - **Editor:** `lua_ls`
 
-> `gopls` (Go) and `omnisharp` (C#) are **not** installed by default (they need the
-> Go / .NET toolchains). Add them back to the `ensure_installed` list in
-> `lua/user/lsp.lua` once those toolchains are present.
+### Language toolchains (needed for full intellisense / debug / tests)
+
+Neovim's plugins (LSP servers, debug adapters, test runners) install via Mason, but they
+drive your **system toolchains**. Install the ones for the languages you use:
+
+| Language | Needs on PATH | For |
+|----------|---------------|-----|
+| Python | `python3` (+ `pytest` for tests) | pyright · debugpy · neotest |
+| Go | Go toolchain (`go`) | gopls · delve · neotest-golang |
+| Rust | `rustup`/`cargo` | rust_analyzer · codelldb debug |
+| C# | .NET runtime | omnisharp · netcoredbg |
+| JS/TS | Node (have) + `jest` | ts_ls · js-debug · neotest-jest |
+| Ruby | Ruby (have) + `rspec`, `debug` gem | solargraph · rdbg · neotest-rspec |
+
+> Servers/adapters whose toolchain is missing simply won't run (no crash). `gopls` and
+> `delve` even need Go present just to **install**. Install the toolchain, then `:Mason`.
 
 ### Optional productivity tools
 
@@ -455,6 +469,14 @@ builds, generate it with [bear](https://github.com/rizsotto/Bear): `bear -- make
 | **hardtime.nvim** | Vim-motion trainer — nudges you toward better motions |
 | **precognition.nvim** | Live motion hints overlay (`:Precognition`) |
 | **grug-far.nvim** | Visual search & replace across the project (`<Space>S`) |
+| **persistence.nvim** | Reopen the project where you left off (auto session) |
+| **diffview.nvim** | Side-by-side git diffs & history (`<Space>gD`) |
+| **trouble.nvim** | Persistent Problems / diagnostics panel (`<Space>xx`) |
+| **aerial.nvim** | Outline — symbol tree sidebar (`<Space>o`) |
+| **neotest** (+ python/go/jest/rspec) | Test Explorer — run/debug tests (`<Space>T…`) |
+| **vim-visual-multi** | True multi-cursor (`<C-n>`, like VS Code Ctrl+D) |
+| **markdown-preview.nvim** | Live Markdown preview in the browser (`<Space>mp`) |
+| **nvim-dap-python / -go / -ruby** | Debug adapters for Python, Go, Ruby |
 | **nvim-dap** (+ dap-ui, virtual-text) | Debugger: breakpoints, stepping, watches |
 | **mason-nvim-dap** | Auto-installs `codelldb` (C/C++/Rust debugger) |
 | **cmake-tools.nvim** | CMake configure/build/run/debug from Neovim |

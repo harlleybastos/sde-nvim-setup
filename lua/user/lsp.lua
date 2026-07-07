@@ -27,8 +27,11 @@ mason_lspconfig.setup({
     -- Game / native / graphics
     "cmake",          -- CMakeLists.txt (cmake-language-server)
     "glsl_analyzer",  -- GLSL shaders (OpenGL / Vulkan)
-    -- Removed gopls (needs Go) and omnisharp (needs .NET). Add them back
-    -- here once the toolchain is installed, along with their config blocks.
+    -- More languages (intellisense)
+    "pyright",        -- Python  (needs python3 on PATH)
+    "rust_analyzer",  -- Rust    (best with the rust toolchain / rustup)
+    "gopls",          -- Go      (Mason installs via `go install` -> needs Go)
+    "omnisharp",      -- C#      (needs the .NET runtime to RUN)
   },
   -- We enable + configure every server explicitly below (attaching cmp
   -- capabilities), so disable mason's automatic enable to avoid a second,
@@ -130,6 +133,8 @@ local simple_servers = {
   "ts_ls",
   "cmake",          -- CMakeLists.txt
   "glsl_analyzer",  -- GLSL shaders (OpenGL / Vulkan)
+  "pyright",        -- Python
+  "rust_analyzer",  -- Rust
 }
 for _, server in ipairs(simple_servers) do
   vim.lsp.config(server, { capabilities = capabilities })
@@ -161,6 +166,29 @@ vim.lsp.config("clangd", {
   },
 })
 vim.lsp.enable("clangd")
+
+-- ── Go ───────────────────────────────────────────────────
+vim.lsp.config("gopls", {
+  capabilities = capabilities,
+  settings = {
+    gopls = {
+      analyses    = { unusedparams = true, shadow = true },
+      staticcheck = true,
+      gofumpt     = true,
+    },
+  },
+})
+vim.lsp.enable("gopls")
+
+-- ── C# (OmniSharp) ───────────────────────────────────────
+vim.lsp.config("omnisharp", {
+  capabilities = capabilities,
+  settings = {
+    FormattingOptions       = { EnableEditorConfigSupport = true },
+    RoslynExtensionsOptions = { EnableAnalyzersSupport = true },
+  },
+})
+vim.lsp.enable("omnisharp")
 
 -- ── JSON ─────────────────────────────────────────────────
 local schemastore_ok, schemastore = pcall(require, "schemastore")

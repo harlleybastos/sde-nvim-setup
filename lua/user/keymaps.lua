@@ -21,6 +21,7 @@ keymap("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>",  { desc = "Find
 keymap("n", "<leader>fw", ":Telescope grep_string<CR>",           { desc = "Find word under cursor" })
 keymap("n", "<leader>fk", ":Telescope keymaps<CR>",               { desc = "Find keymaps" })
 keymap("n", "<leader>fh", ":Telescope help_tags<CR>",             { desc = "Find help" })
+keymap("n", "<leader>fc", ":Telescope commands<CR>",              { desc = "Command palette (run any command)" })
 keymap("n", "<C-p>",      ":Telescope find_files<CR>",            { desc = "Find files (Ctrl-P)" })
 
 -- ── File explorer ────────────────────────────────────────
@@ -60,7 +61,9 @@ pcall(vim.keymap.del, "x", "gra")
 -- ── Buffers ──────────────────────────────────────────────
 keymap("n", "<Tab>",   ":bnext<CR>",     { desc = "Next buffer" })
 keymap("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
-keymap("n", "<leader>x", ":bdelete<CR>", { desc = "Close buffer" })
+-- Close buffer moved to <leader>bd (Buffers group) so <leader>x is free for
+-- the Trouble/Problems panel (<leader>xx etc.).
+keymap("n", "<leader>bd", ":bdelete<CR>", { desc = "Close buffer" })
 
 -- ── Move lines in visual mode ────────────────────────────
 keymap("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })

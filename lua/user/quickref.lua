@@ -74,7 +74,7 @@ M.sections = {
       { "<Space>bp",     "pick an open tab by letter" },
       { "<Space>a · 1-5","Harpoon: pin 3-5 files, jump instantly (best)" },
       { "<Space>fb",     "fuzzy-find among open buffers" },
-      { "<Space>x / bo", "close this file / close all others" },
+      { "<Space>bd / bo","close this file / close all others" },
     },
   },
   {

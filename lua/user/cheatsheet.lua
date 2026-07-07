@@ -79,7 +79,7 @@ M.entries = {
   { "<leader>e",      "Toggle file explorer sidebar",                     "4. Files",  "Like Ctrl+Shift+E in VS Code. Opens/closes the file tree." },
   { "<Tab>",          "Switch to next open file (buffer)",                "4. Files",  "Like Ctrl+Tab in VS Code to cycle through open tabs." },
   { "<S-Tab>",        "Switch to previous open file (buffer)",            "4. Files",  "Like Ctrl+Shift+Tab in VS Code." },
-  { "<leader>x",      "Close current file (buffer)",                      "4. Files",  "Like Ctrl+W to close the current tab in VS Code." },
+  { "<leader>bd",     "Close current file (buffer)",                      "4. Files",  "Like Ctrl+W to close the current tab in VS Code." },
   { "<leader>bp",     "Pick a tab/buffer by letter (bufferline)",         "4. Files",  "Shows a letter on each tab — press it to jump straight there." },
   { "<leader>bo",     "Close all OTHER files, keep this one",             "4. Files",  "Like 'Close Others' on a VS Code tab." },
   -- File explorer operations — these work INSIDE the tree (open it with <leader>e)
@@ -251,6 +251,21 @@ M.entries = {
   { "<leader>dr",     "Debug: toggle the REPL / debug console",          "15. C++/Game", "Type expressions to evaluate while paused." },
   { "<leader>dt",     "Debug: terminate the session",                    "15. C++/Game", "Stops debugging." },
   { ".vert / .frag …", "Shaders auto-detected as GLSL (highlight + LSP)", "15. C++/Game", "OpenGL & Vulkan shader files (.vert/.frag/.comp/.rgen/…) get glsl highlighting + glsl_analyzer completion." },
+
+  -- ═══════════════════════════════════════════════════════════════
+  -- EXTRAS — git, tests, panels, sessions, multi-cursor (VS Code parity)
+  -- ═══════════════════════════════════════════════════════════════
+  { "<C-n>",          "Multi-cursor: select word + next match (like Ctrl+D)","16. Extras", "vim-visual-multi. Keep pressing <C-n> to add more; then edit all at once. <C-Down>/<C-Up> add cursors vertically." },
+  { "<leader>gs / gr","Git: stage / reset the hunk under the cursor",     "16. Extras", "Like clicking +/- on a change in VS Code's Source Control." },
+  { "<leader>gp",     "Git: preview the hunk (inline diff)",              "16. Extras", "]h / [h jump between changed hunks." },
+  { "<leader>gb",     "Git: blame this line (who changed it)",            "16. Extras", "" },
+  { "<leader>gD",     "Git: full diff view (side by side)",               "16. Extras", "diffview.nvim, like VS Code's diff editor. <leader>gh = history of this file." },
+  { "<leader>xx",     "Problems panel — all diagnostics (Trouble)",       "16. Extras", "Like VS Code's Problems tab. <leader>xX = this file only." },
+  { "<leader>o",      "Outline — symbol tree sidebar (aerial)",           "16. Extras", "Like VS Code's Outline. Jump between functions/classes." },
+  { "<leader>Tt",     "Test: run the nearest test (neotest)",             "16. Extras", "<leader>Tf run file · <leader>Td debug test · <leader>Ts summary panel · <leader>To output." },
+  { "<leader>mp",     "Markdown preview in the browser",                  "16. Extras", "In a .md file. On WSL it opens the Windows browser (needs wslview)." },
+  { "<leader>fc",     "Command palette — run ANY command (Ctrl+Shift+P)", "16. Extras", "Fuzzy-search every command, like VS Code's palette." },
+  { ":SessionRestore","Reopen the project where you left off",             "16. Extras", "Auto-restores when you open bare `nvim` in a folder you've worked in. Manual: :SessionRestore." },
 
   -- ═══════════════════════════════════════════════════════════════
   -- HELP & DISCOVERY

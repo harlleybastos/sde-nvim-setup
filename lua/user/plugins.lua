@@ -201,7 +201,8 @@ require("lazy").setup({
     "lewis6991/gitsigns.nvim",
     event = "VeryLazy",
     config = function()
-      require("gitsigns").setup({
+      local gs = require("gitsigns")
+      gs.setup({
         signs = {
           add          = { text = "│" },
           change       = { text = "│" },
@@ -210,6 +211,19 @@ require("lazy").setup({
           changedelete = { text = "~" },
         },
         current_line_blame = true,
+        on_attach = function(buf)
+          local function map(l, r, d) vim.keymap.set("n", l, r, { buffer = buf, desc = d }) end
+          -- Visual git (like VS Code's Source Control): stage/reset/preview hunks
+          map("]h", function() gs.nav_hunk("next") end, "Next hunk (git change)")
+          map("[h", function() gs.nav_hunk("prev") end, "Previous hunk")
+          map("<leader>gs", gs.stage_hunk,       "Stage hunk")
+          map("<leader>gr", gs.reset_hunk,       "Reset hunk")
+          map("<leader>gS", gs.stage_buffer,     "Stage whole file")
+          map("<leader>gu", gs.undo_stage_hunk,  "Undo stage hunk")
+          map("<leader>gp", gs.preview_hunk,     "Preview hunk (inline diff)")
+          map("<leader>gb", function() gs.blame_line({ full = true }) end, "Blame this line")
+          map("<leader>gd", gs.diffthis,         "Diff this file")
+        end,
       })
     end,
   },
@@ -252,9 +266,13 @@ require("lazy").setup({
         { "<leader>c",  group = "Code" },
         { "<leader>l",  group = "LSP" },
         { "<leader>b",  group = "Buffers / tabs" },
-        { "<leader>t",  group = "Terminal / git" },
+        { "<leader>t",  group = "Terminal" },
         { "<leader>d",  group = "Debug (DAP)" },
         { "<leader>C",  group = "CMake (build/run/debug)" },
+        { "<leader>g",  group = "Git (hunks / diff)" },
+        { "<leader>x",  group = "Problems / diagnostics" },
+        { "<leader>T",  group = "Tests (neotest)" },
+        { "<leader>m",  group = "Markdown" },
       })
     end,
   },
@@ -479,6 +497,9 @@ require("lazy").setup({
       "nvim-neotest/nvim-nio",
       "theHamsta/nvim-dap-virtual-text",
       "jay-babu/mason-nvim-dap.nvim",
+      "mfussenegger/nvim-dap-python",   -- Python (debugpy)
+      "leoluz/nvim-dap-go",             -- Go (delve)
+      "suketa/nvim-dap-ruby",           -- Ruby (rdbg / debug gem)
     },
     keys = {
       { "<F5>",  function() require("dap").continue() end,   desc = "Debug: start / continue" },
@@ -498,9 +519,10 @@ require("lazy").setup({
       local dap   = require("dap")
       local dapui = require("dapui")
 
-      -- Auto-install codelldb and wire its adapter
+      -- Auto-install debug adapters and wire them (default handler configures
+      -- codelldb=C/C++/Rust, js=JS/TS, netcoredbg=C#; python/go/ruby set up below).
       require("mason-nvim-dap").setup({
-        ensure_installed = { "codelldb" },
+        ensure_installed = { "codelldb", "python", "delve", "js", "netcoredbg" },
         automatic_installation = true,
         handlers = {
           function(config) require("mason-nvim-dap").default_setup(config) end,
@@ -509,6 +531,12 @@ require("lazy").setup({
 
       dapui.setup()
       require("nvim-dap-virtual-text").setup()
+
+      -- Language-specific helpers (richer than the generic defaults)
+      local mason_pkgs = vim.fn.stdpath("data") .. "/mason/packages"
+      pcall(function() require("dap-python").setup(mason_pkgs .. "/debugpy/venv/bin/python") end)
+      pcall(function() require("dap-go").setup() end)
+      pcall(function() require("dap-ruby").setup() end)
 
       -- C / C++ launch config (prompts for the built executable)
       local launch = {
@@ -530,8 +558,9 @@ require("lazy").setup({
           cwd     = "${workspaceFolder}",
         },
       }
-      dap.configurations.cpp = launch
-      dap.configurations.c   = launch
+      dap.configurations.cpp  = launch
+      dap.configurations.c    = launch
+      dap.configurations.rust = launch   -- codelldb debugs Rust too
 
       -- Nicer breakpoint / stopped signs
       vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DiagnosticError" })
@@ -588,6 +617,123 @@ require("lazy").setup({
       inlay_hints = { inline = true },
       ast = { role_icons = {}, kind_icons = {} },
     },
+  },
+
+  -- ══════════════════════════════════════════════════════════
+  -- VS CODE PARITY PACK
+  -- ══════════════════════════════════════════════════════════
+
+  -- ── persistence — reopen the project where you left off ──
+  -- Auto-restores the session when you open `nvim` with no file in a folder
+  -- you've worked in before (like VS Code reopening your workspace).
+  {
+    "folke/persistence.nvim",
+    lazy = false,
+    config = function()
+      require("persistence").setup()
+      vim.api.nvim_create_autocmd("VimEnter", {
+        nested = true,
+        callback = function()
+          local ft = vim.bo.filetype
+          if vim.fn.argc() == 0 and ft ~= "gitcommit" and ft ~= "gitrebase" then
+            require("persistence").load()
+          end
+        end,
+      })
+      vim.api.nvim_create_user_command("SessionRestore",
+        function() require("persistence").load() end, { desc = "Restore session for this folder" })
+      vim.api.nvim_create_user_command("SessionRestoreLast",
+        function() require("persistence").load({ last = true }) end, { desc = "Restore the last session" })
+    end,
+  },
+
+  -- ── diffview — side-by-side diffs & merge (VS Code diff editor) ──
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
+    opts = {},
+    keys = {
+      { "<leader>gD", "<cmd>DiffviewOpen<CR>",          desc = "Git: diff view (working tree)" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", desc = "Git: file history (this file)" },
+      { "<leader>gH", "<cmd>DiffviewFileHistory<CR>",   desc = "Git: repo/branch history" },
+    },
+  },
+
+  -- ── vim-visual-multi — true multi-cursor (VS Code Ctrl+D) ──
+  -- <C-n> selects the word + next occurrence · <C-Down>/<C-Up> add cursors.
+  {
+    "mg979/vim-visual-multi",
+    branch = "master",
+    event  = "VeryLazy",
+  },
+
+  -- ── markdown-preview — live preview in the browser ──
+  {
+    "iamcco/markdown-preview.nvim",
+    ft    = "markdown",
+    build = function() vim.fn["mkdp#util#install"]() end,
+    keys  = {
+      { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", desc = "Markdown preview (browser)" },
+    },
+    config = function()
+      if vim.fn.has("wsl") == 1 then vim.g.mkdp_browser = "wslview" end  -- open in Windows browser
+    end,
+  },
+
+  -- ── trouble — persistent Problems / diagnostics panel ──
+  {
+    "folke/trouble.nvim",
+    cmd  = "Trouble",
+    opts = {},
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>",              desc = "Problems: all diagnostics" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", desc = "Problems: this file only" },
+      { "<leader>xq", "<cmd>Trouble qflist toggle<CR>",                   desc = "Quickfix list" },
+      { "<leader>xl", "<cmd>Trouble loclist toggle<CR>",                  desc = "Location list" },
+    },
+  },
+
+  -- ── aerial — Outline panel (symbol tree sidebar) ──
+  {
+    "stevearc/aerial.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    cmd  = "AerialToggle",
+    opts = {},
+    keys = {
+      { "<leader>o", "<cmd>AerialToggle!<CR>", desc = "Outline (symbols sidebar)" },
+    },
+  },
+
+  -- ── neotest — Test Explorer (run/debug tests, see pass/fail) ──
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-neotest/neotest-python",     -- Python (pytest/unittest)
+      "fredrikaverpil/neotest-golang",   -- Go
+      "nvim-neotest/neotest-jest",       -- JS / TS (jest)
+      "olimorris/neotest-rspec",         -- Ruby (rspec)
+    },
+    keys = {
+      { "<leader>Tt", function() require("neotest").run.run() end,                     desc = "Test: run nearest" },
+      { "<leader>Tf", function() require("neotest").run.run(vim.fn.expand("%")) end,   desc = "Test: run file" },
+      { "<leader>Td", function() require("neotest").run.run({ strategy = "dap" }) end, desc = "Test: debug nearest" },
+      { "<leader>Ts", function() require("neotest").summary.toggle() end,              desc = "Test: summary panel" },
+      { "<leader>To", function() require("neotest").output.open({ enter = true }) end, desc = "Test: show output" },
+      { "<leader>TS", function() require("neotest").run.stop() end,                    desc = "Test: stop" },
+    },
+    config = function()
+      require("neotest").setup({
+        adapters = {
+          require("neotest-python"),
+          require("neotest-golang"),
+          require("neotest-jest"),
+          require("neotest-rspec"),
+        },
+      })
+    end,
   },
 
 }, {
