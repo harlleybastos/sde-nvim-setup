@@ -454,6 +454,7 @@ builds, generate it with [bear](https://github.com/rizsotto/Bear): `bear -- make
 | **nvim-navic** | Code breadcrumbs in the winbar |
 | **hardtime.nvim** | Vim-motion trainer — nudges you toward better motions |
 | **precognition.nvim** | Live motion hints overlay (`:Precognition`) |
+| **grug-far.nvim** | Visual search & replace across the project (`<Space>S`) |
 | **nvim-dap** (+ dap-ui, virtual-text) | Debugger: breakpoints, stepping, watches |
 | **mason-nvim-dap** | Auto-installs `codelldb` (C/C++/Rust debugger) |
 | **cmake-tools.nvim** | CMake configure/build/run/debug from Neovim |

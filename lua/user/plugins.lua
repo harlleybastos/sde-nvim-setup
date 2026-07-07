@@ -347,6 +347,30 @@ require("lazy").setup({
     end,
   },
 
+  -- ── grug-far — visual search & replace across the project ──
+  -- A panel with live preview of every change (like VS Code's Search/Replace).
+  -- Needs ripgrep (already installed). <leader>S opens it prefilled with the
+  -- word under the cursor; in visual mode it searches the selection.
+  {
+    "MagicDuck/grug-far.nvim",
+    cmd  = "GrugFar",
+    opts = {},
+    keys = {
+      {
+        "<leader>S",
+        function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end,
+        mode = "n",
+        desc = "Search & Replace in project (word under cursor)",
+      },
+      {
+        "<leader>S",
+        function() require("grug-far").with_visual_selection() end,
+        mode = "x",
+        desc = "Search & Replace in project (selection)",
+      },
+    },
+  },
+
   -- ── toggleterm — integrated terminal (like VS Code's Ctrl+`) ──
   -- <C-\> toggles a floating terminal without leaving Neovim.
   {

@@ -72,6 +72,7 @@ M.entries = {
   { "<leader>ff",     "Find and open a file by name",                     "4. Files",  "Exactly like Ctrl+P in VS Code. Type part of the filename." },
   { "<C-p>",          "Find and open a file by name (alternative)",       "4. Files",  "Same as <leader>ff — the Ctrl+P shortcut you're used to." },
   { "<leader>fg",     "Search for text inside all files (grep)",          "4. Files",  "Like Ctrl+Shift+F in VS Code. Search across the entire project." },
+  { "<leader>S",      "Search & REPLACE across the project (grug-far)",   "4. Files",  "Opens a panel with live preview of every change, like VS Code's Search/Replace. Edit the Search/Replace boxes, then apply. In visual mode it prefills the selection." },
   { "<leader>fr",     "Open a recently edited file",                      "4. Files",  "Shows files you edited recently, like VS Code's recent files list." },
   { "<leader>fb",     "Switch between open files (buffers)",              "4. Files",  "Like clicking tabs in VS Code. Shows all open files." },
   { "<leader>fw",     "Search all files for the word under cursor",       "4. Files",  "Put cursor on a word and instantly grep the whole project for it." },

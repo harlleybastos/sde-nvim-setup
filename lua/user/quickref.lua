@@ -91,6 +91,7 @@ M.sections = {
   {
     title = "7 · REPLACE — change & rename",
     rows = {
+      { "<Space>S",      "SEARCH & REPLACE in project — visual panel + preview" },
       { "<Space>rn",     "rename symbol (semantic)         (F2) <- use this" },
       { ":%s/old/new/g", "replace in file · add /gc to confirm  (Ctrl+H)" },
       { "V -> :s/o/n/g", "replace in the selection only" },
